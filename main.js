@@ -178,8 +178,26 @@ function loadQuestion() {
         // Eğer daha önce seçilmişse vurgula
         const btnHarfHTML = btnHTML.match(/([A-D])\)/);
         const thisBtnHarf = btnHarfHTML ? btnHarfHTML[1] : secenek.split(')')[0].trim();
-        if (isMockExam && userAnswers[currentQuestionIndex] === thisBtnHarf) {
-            button.classList.add('selected-option');
+
+        // Daha önce bu soruya cevap verildiyse (kullanıcı geri döndüyse)
+        if (userAnswers[currentQuestionIndex]) {
+            button.disabled = true; // Tüm şıkları kilitle, değiştirtme
+
+            if (userAnswers[currentQuestionIndex] === thisBtnHarf) {
+                if (isMockExam) {
+                    button.classList.add('selected-option');
+                } else {
+                    // Practice modundaysa doğru/yanlış rengini de geri yükle
+                    if (thisBtnHarf === q.cevap) {
+                        button.classList.add('correct');
+                    } else {
+                        button.classList.add('wrong');
+                    }
+                }
+            } else if (!isMockExam && thisBtnHarf === q.cevap) {
+                // Practice modundaysa ve bu buton doğru cevapsa, diğer buton da yanlış seçilmişse, doğruyu da yeşil göster
+                button.classList.add('correct');
+            }
         }
 
         button.innerHTML = btnHTML;
@@ -205,20 +223,21 @@ function checkAnswer(clickedButton, secilenMetin, dogruCevapHarfi) {
     const optionsContainer = document.getElementById('options-container');
     const allButtons = Array.from(optionsContainer.children);
 
+    // Daha önceden cevaplandıysa hiçbir işlem yapma (güvenlik)
+    if (userAnswers[currentQuestionIndex]) return;
+
     const secilenHarf = secilenMetin.split(')')[0].trim();
     userAnswers[currentQuestionIndex] = secilenHarf;
 
-    // Önceki seçimleri temizle
-    allButtons.forEach(btn => btn.classList.remove('selected-option', 'correct', 'wrong'));
+    // Şıkları kilitle ki bir daha basamasın (Sadece bu soruyu, ilk seçimde)
+    allButtons.forEach(btn => btn.disabled = true);
 
     if (isMockExam) {
         clickedButton.classList.add('selected-option');
         return;
     }
 
-    // Practice Modu İse (Anında Renklendirme, ama butonlar kilitlenmez, değiştirebilir)
-    clickedButton.classList.add('selected-option');
-
+    // Practice Modu İse (Anında Renklendirme)
     allButtons.forEach(btn => {
         const btnHarfHTML = btn.innerHTML.match(/([A-D])\)/);
         const thisBtnHarf = btnHarfHTML ? btnHarfHTML[1] : btn.innerText.split(')')[0].trim();
