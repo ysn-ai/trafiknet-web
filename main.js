@@ -438,7 +438,7 @@ window.reviewMistakes = function () {
                 // Resim formatını kontrol et
                 const parts = opt.split(") ");
                 if (parts.length === 2 && parts[1].startsWith('http')) {
-                    optionsHtml += `<div style="margin-bottom: 8px; ${bgAttr}"><span style="${colorAttr}">${parts[0]}) </span><img src="${parts[1]}" style="max-height: 40px; vertical-align: middle;"></div>`;
+                    optionsHtml += `<div style="margin-bottom: 8px; ${bgAttr}"><span style="${colorAttr}">${parts[0]}) </span><img src="${parts[1]}" alt="Soru Şıkkı Görseli" style="max-height: 40px; vertical-align: middle;"></div>`;
                 } else {
                     optionsHtml += `<div style="margin-bottom: 8px; ${bgAttr}"><span style="${colorAttr}">${opt}</span></div>`;
                 }
@@ -446,7 +446,7 @@ window.reviewMistakes = function () {
 
             let imgHtml = '';
             if (q.imageUrl) {
-                imgHtml = `<div style="margin-bottom: 10px;"><img src="${q.imageUrl}" style="max-height: 150px; border-radius: 6px;"></div>`;
+                imgHtml = `<div style="margin-bottom: 10px;"><img src="${q.imageUrl}" alt="Soru İllüstrasyonu" style="max-height: 150px; border-radius: 6px;"></div>`;
             }
 
             div.innerHTML = `
