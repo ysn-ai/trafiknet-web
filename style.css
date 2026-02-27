@@ -1152,3 +1152,52 @@ body {
     color: var(--orange) !important;
     box-shadow: 0 0 0 2px var(--orange) inset !important;
 }
+
+/* --- MOBILE FIRST & RESPONSIVE REFINEMENTS --- */
+@media (max-width: 768px) {
+
+    /* Fluid Typography for Mobile (using min max scalable rems/vws) */
+    .hero h1 {
+        font-size: clamp(2rem, 8vw, 2.5rem);
+        padding: 0 1rem;
+    }
+
+    .hero p {
+        font-size: clamp(1rem, 4vw, 1.1rem);
+        padding: 0 1rem;
+    }
+
+    .section-title {
+        font-size: clamp(1.5rem, 6vw, 2rem);
+    }
+
+    /* Adjust padding for cards to prevent text wrapping/overlap */
+    .lesson-card,
+    .pricing-card {
+        padding: 1.5rem 1.25rem;
+    }
+
+    /* Modal padding for smaller viewports */
+    .modal-content {
+        padding: 1.5rem;
+        margin: 15% auto;
+        width: 95%;
+    }
+
+    /* Quiz layout constraints */
+    .quiz-header {
+        flex-direction: column;
+        gap: 10px;
+        align-items: flex-start;
+    }
+
+    .option-btn {
+        padding: 1rem;
+        font-size: 0.95rem;
+    }
+
+    /* Adjust nav spacing */
+    .nav-links {
+        gap: 1rem;
+    }
+}
