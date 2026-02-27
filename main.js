@@ -205,40 +205,30 @@ function checkAnswer(clickedButton, secilenMetin, dogruCevapHarfi) {
     const optionsContainer = document.getElementById('options-container');
     const allButtons = Array.from(optionsContainer.children);
 
-    // Tıklanan metinden kullanıcının seçtiği harfi ayıkla (Örn: "A) HTTP..." -> "A")
     const secilenHarf = secilenMetin.split(')')[0].trim();
+    userAnswers[currentQuestionIndex] = secilenHarf;
+
+    // Önceki seçimleri temizle
+    allButtons.forEach(btn => btn.classList.remove('selected-option', 'correct', 'wrong'));
 
     if (isMockExam) {
-        // Mock sınavında anında doğru/yanlış gösterme, sadece seçimi kaydet
-        userAnswers[currentQuestionIndex] = secilenHarf;
-
-        allButtons.forEach(btn => btn.classList.remove('selected-option'));
         clickedButton.classList.add('selected-option');
-        return; // Burada bitir
+        return;
     }
 
-    // Practice Modu İse (Gerçek Zamanlı Dönüt)
-    allButtons.forEach(btn => btn.disabled = true);
-    const isCorrect = (secilenHarf === dogruCevapHarfi);
+    // Practice Modu İse (Anında Renklendirme, ama butonlar kilitlenmez, değiştirebilir)
+    clickedButton.classList.add('selected-option');
 
-    // Renklendirme Ataması
     allButtons.forEach(btn => {
         const btnHarfHTML = btn.innerHTML.match(/([A-D])\)/);
         const thisBtnHarf = btnHarfHTML ? btnHarfHTML[1] : btn.innerText.split(')')[0].trim();
 
         if (thisBtnHarf === dogruCevapHarfi) {
             btn.classList.add('correct');
+        } else if (thisBtnHarf === secilenHarf && secilenHarf !== dogruCevapHarfi) {
+            btn.classList.add('wrong');
         }
     });
-
-    if (isCorrect) {
-        score += 10;
-        correctCount++;
-        document.getElementById('score-display').innerText = `Puan: ${score}`;
-    } else {
-        wrongCount++;
-        clickedButton.classList.add('wrong');
-    }
 
     document.getElementById('next-btn').style.display = 'block';
 }
@@ -249,23 +239,15 @@ function updateNavigationButtons() {
     const nextBtn = document.getElementById('next-btn');
     const finishBtn = document.getElementById('finish-btn');
 
-    if (isMockExam) {
-        navDiv.style.display = 'flex';
-        prevBtn.style.display = currentQuestionIndex > 0 ? 'block' : 'none';
+    navDiv.style.display = 'flex';
+    prevBtn.style.display = currentQuestionIndex > 0 ? 'block' : 'none';
 
-        if (currentQuestionIndex === activeQuestions.length - 1) {
-            nextBtn.style.display = 'none';
-            finishBtn.style.display = 'block';
-        } else {
-            nextBtn.style.display = 'block';
-            finishBtn.style.display = 'none';
-        }
+    if (currentQuestionIndex === activeQuestions.length - 1) {
+        nextBtn.style.display = 'none';
+        finishBtn.style.display = 'block';
     } else {
-        // Practice mode
-        navDiv.style.display = 'flex';
-        prevBtn.style.display = 'none';
+        nextBtn.style.display = 'block';
         finishBtn.style.display = 'none';
-        nextBtn.style.display = 'none'; // Sadece cevaplanınca gösterilecek checkAnswer'da
     }
 }
 
@@ -297,33 +279,33 @@ window.finishExam = function () {
     document.getElementById('quiz-screen').style.display = 'none';
     document.getElementById('result-screen').style.display = 'block';
 
-    // Skor Hesaplama (Mock Exam için)
-    if (isMockExam) {
-        correctCount = 0;
-        wrongCount = 0;
-        let blankCount = 0;
-        score = 0;
+    // Her iki MOD için de aynı döngü ile puan/doğru/yanlış hesapla
+    correctCount = 0;
+    wrongCount = 0;
+    let blankCount = 0;
+    score = 0;
 
-        for (let i = 0; i < activeQuestions.length; i++) {
-            const dogruCevap = activeQuestions[i].cevap;
-            const kullaniciCevabi = userAnswers[i];
+    for (let i = 0; i < activeQuestions.length; i++) {
+        const dogruCevap = activeQuestions[i].cevap;
+        const kullaniciCevabi = userAnswers[i];
 
-            if (!kullaniciCevabi) {
-                blankCount++;
-            } else if (kullaniciCevabi === dogruCevap) {
-                correctCount++;
-                score += (100 / activeQuestions.length); // Dinamik puan
-            } else {
-                wrongCount++;
-            }
+        if (!kullaniciCevabi) {
+            blankCount++;
+        } else if (kullaniciCevabi === dogruCevap) {
+            correctCount++;
+            score += (100 / activeQuestions.length); // Dinamik puan
+        } else {
+            wrongCount++;
         }
+    }
 
-        document.getElementById('res-correct').innerText = correctCount;
-        document.getElementById('res-wrong').innerText = wrongCount;
-        document.getElementById('res-blank').innerText = blankCount;
-        document.getElementById('res-score').innerText = Math.round(score);
+    document.getElementById('res-correct').innerText = correctCount;
+    document.getElementById('res-wrong').innerText = wrongCount;
+    document.getElementById('res-blank').innerText = blankCount;
+    document.getElementById('res-score').innerText = Math.round(score);
 
-        const statusEl = document.getElementById('res-status');
+    const statusEl = document.getElementById('res-status');
+    if (isMockExam) {
         if (score >= 70) {
             statusEl.innerText = "Tebrikler, Geçtiniz! 🎉";
             statusEl.style.backgroundColor = "#dcfce3";
@@ -333,16 +315,7 @@ window.finishExam = function () {
             statusEl.style.backgroundColor = "#fee2e2";
             statusEl.style.color = "#dc2626";
         }
-
     } else {
-        // Eski tarz results
-        const totalAnswered = currentQuestionIndex;
-        document.getElementById('res-correct').innerText = correctCount;
-        document.getElementById('res-wrong').innerText = wrongCount;
-        document.getElementById('res-blank').innerText = 0;
-        document.getElementById('res-score').innerText = score;
-
-        const statusEl = document.getElementById('res-status');
         statusEl.innerText = "Pratik Testi Tamamlandı!";
         statusEl.style.backgroundColor = "#f1f5f9";
         statusEl.style.color = "#64748b";
@@ -367,7 +340,7 @@ window.reviewMistakes = function () {
         const q = activeQuestions[i];
         const userAnswer = userAnswers[i];
 
-        if (userAnswer && userAnswer !== q.cevap) {
+        if (!userAnswer || userAnswer !== q.cevap) {
             hasMistakes = true;
 
             const div = document.createElement('div');
