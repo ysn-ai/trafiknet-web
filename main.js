@@ -64,7 +64,13 @@ document.addEventListener('DOMContentLoaded', () => {
 import { collection, getDocs, query, where } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
 window.showPreExamScreen = function () {
-    document.getElementById('mode-selection').style.display = 'none';
+    const modeSel = document.getElementById('mode-selection');
+    if (modeSel) modeSel.style.display = 'none';
+
+    // quiz-container içindeki her şeyi gizle
+    const quizScr = document.getElementById('quiz-screen');
+    if (quizScr) quizScr.style.display = 'none';
+
     document.getElementById('pre-exam-screen').style.display = 'block';
 };
 
@@ -81,8 +87,11 @@ window.startNewQuiz = async function (secilenKategori = null) {
     if (secilenKategori === 'mock') {
         isMockExam = true;
         secilenKategori = null; // Karışık olacak
+        startExamTimer();
     } else {
         isMockExam = false;
+        const timerEl = document.getElementById('exam-timer');
+        if (timerEl) timerEl.style.display = 'none';
     }
 
     // UI'da ufak bir yükleniyor durumu gösterebiliriz (basitçe testin içine yazarak)

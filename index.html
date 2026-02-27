@@ -447,6 +447,58 @@
     <!-- Chart.js CDN -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
+    <!-- Profil Ayarları Modalı -->
+    <div id="profileSettingsModal" class="modal">
+        <div class="modal-content" style="max-width: 400px;">
+            <span class="close-btn" onclick="closeProfileSettingsModal()">&times;</span>
+            <div class="modal-header" style="margin-bottom: 20px;">
+                <h2>Hesabı Düzenle</h2>
+                <p style="font-size: 13px; color: var(--text-light); margin-top: 5px;">Bilgilerini ve avatarını
+                    güncelle.</p>
+            </div>
+
+            <div id="settingsMessage"
+                style="display: none; padding: 10px; border-radius: 6px; margin-bottom: 15px; font-size: 14px; text-align: center; background: #f8fafc;">
+            </div>
+
+            <!-- Avatar Seçimi -->
+            <div class="input-group">
+                <label>Avatar Seçimi</label>
+                <div class="avatar-selection-grid"
+                    style="display: flex; gap: 10px; justify-content: center; margin-bottom: 15px;">
+                    <div class="avatar-option" onclick="selectAvatar(this, '👤')"
+                        style="font-size: 30px; cursor: pointer; padding: 10px; border: 2px solid transparent; border-radius: 50%;">
+                        👤</div>
+                    <div class="avatar-option" onclick="selectAvatar(this, '👨‍🎓')"
+                        style="font-size: 30px; cursor: pointer; padding: 10px; border: 2px solid transparent; border-radius: 50%;">
+                        👨‍🎓</div>
+                    <div class="avatar-option" onclick="selectAvatar(this, '👩‍🎓')"
+                        style="font-size: 30px; cursor: pointer; padding: 10px; border: 2px solid transparent; border-radius: 50%;">
+                        👩‍🎓</div>
+                    <div class="avatar-option" onclick="selectAvatar(this, '🚗')"
+                        style="font-size: 30px; cursor: pointer; padding: 10px; border: 2px solid transparent; border-radius: 50%;">
+                        🚗</div>
+                    <div class="avatar-option" onclick="selectAvatar(this, '🚦')"
+                        style="font-size: 30px; cursor: pointer; padding: 10px; border: 2px solid transparent; border-radius: 50%;">
+                        🚦</div>
+                </div>
+                <input type="hidden" id="selectedAvatarInput" value="👤">
+            </div>
+
+            <div class="input-group">
+                <label>Görünür İsim (Ad Soyad)</label>
+                <input type="text" id="updateNameInput" placeholder="Adınız Soyadınız">
+            </div>
+
+            <div class="input-group" style="margin-bottom: 25px;">
+                <label>Yeni Şifre (Değiştirmek için doldurun)</label>
+                <input type="password" id="updatePasswordInput" placeholder="En az 6 karakter">
+            </div>
+
+            <button class="btn-orange" style="width: 100%;" onclick="saveProfileSettings()">Kaydet</button>
+        </div>
+    </div>
+
     <script type="module" src="main.js"></script>
     <script type="module" src="auth.js"></script>
 </body>
