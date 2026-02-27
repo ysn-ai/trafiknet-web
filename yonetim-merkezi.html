@@ -296,8 +296,12 @@
                 <div class="logo-text">Trafik<span>Net</span></div>
             </div>
             <ul class="nav-links">
-                <li><span style="color: var(--navy); font-weight: 700; margin-right: 15px;">Admin Panel</span></li>
-                <li><a href="#" class="btn-outline-small" onclick="handleLogout()">Çıkış Yap</a></li>
+                <li><button class="btn-outline-small" onclick="switchAdminTab('questions')" id="tab-questions"
+                        style="background: var(--navy); color: white;">📚 Soru Havuzu</button></li>
+                <li><button class="btn-outline-small" onclick="switchAdminTab('reports')" id="tab-reports">🚨 Hata
+                        Bildirimleri</button></li>
+                <li><a href="#" class="btn-outline-small" onclick="handleLogout()" style="margin-left: 15px;">Çıkış
+                        Yap</a></li>
             </ul>
         </div>
     </nav>
@@ -414,10 +418,11 @@
                         id="saveQuestionBtn">Soruyu Firebase'e Kaydet</button>
                 </div>
             </form>
+            </form>
         </div>
 
         <!-- Question List -->
-        <div class="admin-card">
+        <div class="admin-card" id="questionsSection">
             <h2 style="color: var(--navy); margin-bottom: 25px; font-size: 20px;">Soru Havuzu (<span
                     id="totalQuestionsCount">0</span>)</h2>
             <div class="questions-table-wrapper">
@@ -432,6 +437,30 @@
                         </tr>
                     </thead>
                     <tbody id="questionsTableBody">
+                        <tr>
+                            <td colspan="5" style="text-align: center;">Yükleniyor...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Reports List -->
+        <div class="admin-card" id="reportsSection" style="display: none;">
+            <h2 style="color: var(--navy); margin-bottom: 25px; font-size: 20px;">Gelen Hata Bildirimleri (<span
+                    id="totalReportsCount">0</span>)</h2>
+            <div class="questions-table-wrapper">
+                <table id="reportsTable" style="width: 100%;">
+                    <thead>
+                        <tr>
+                            <th style="width: 15%;">Tarih</th>
+                            <th style="width: 20%;">Kullanıcı</th>
+                            <th style="width: 15%;">Hata Türü</th>
+                            <th style="width: 35%;">Açıklama & Soru ID</th>
+                            <th style="width: 15%; text-align: right;">İşlem</th>
+                        </tr>
+                    </thead>
+                    <tbody id="reportsTableBody">
                         <tr>
                             <td colspan="5" style="text-align: center;">Yükleniyor...</td>
                         </tr>

@@ -168,6 +168,44 @@
         </div>
     </section>
 
+    <!-- Hatalı Soru Bildir Modalı -->
+    <div id="reportModal" class="modal">
+        <div class="modal-content" style="max-width: 400px; padding: 25px;">
+            <span class="close-btn" onclick="closeReportModal()">&times;</span>
+            <h3 style="color: var(--navy); margin-bottom: 5px;">Hata Bildir</h3>
+            <p style="color: var(--text-light); font-size: 13px; margin-bottom: 20px;">Sorudaki hatayı lütfen açıklayın.
+            </p>
+
+            <div id="reportSuccessMsg"
+                style="display: none; padding: 10px; background: #dcfce3; color: #16a34a; border-radius: 6px; font-weight: 600; text-align: center; margin-bottom: 15px; font-size: 14px;">
+                Geri bildiriminiz başarıyla iletildi, teşekkür ederiz!
+            </div>
+
+            <input type="hidden" id="reportQuestionId">
+
+            <label
+                style="font-size: 14px; font-weight: 600; color: var(--navy); display: block; margin-bottom: 8px;">Hata
+                Türü:</label>
+            <select id="reportErrorType"
+                style="width: 100%; padding: 10px; border: 1px solid var(--border); border-radius: 8px; margin-bottom: 15px; font-family: 'Plus Jakarta Sans';">
+                <option value="Yanlış Cevap">Yanlış Cevap Anahtarı</option>
+                <option value="Hatalı Soru Metni">Soru Metni Hatalı</option>
+                <option value="Görsel Eksik/Hatalı">Görsel Eksik veya Hatalı</option>
+                <option value="Müfredat Dışı">Müfredat Dışı Soru</option>
+                <option value="Diğer">Diğer</option>
+            </select>
+
+            <label
+                style="font-size: 14px; font-weight: 600; color: var(--navy); display: block; margin-bottom: 8px;">Açıklama
+                (İsteğe Bağlı):</label>
+            <textarea id="reportUserNote" rows="3" placeholder="Gördüğünüz hatayı kısaca açıklayın..."
+                style="width: 100%; padding: 10px; border: 1px solid var(--border); border-radius: 8px; margin-bottom: 20px; font-family: 'Plus Jakarta Sans'; resize: vertical;"></textarea>
+
+            <button id="submitReportBtn" class="btn-orange" style="width: 100%; padding: 12px; font-size: 15px;"
+                onclick="submitErrorReport()">Gönder</button>
+        </div>
+    </div>
+
     <script type="module" src="main.js"></script>
     <script type="module" src="auth.js"></script>
 </body>

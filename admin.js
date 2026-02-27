@@ -293,3 +293,119 @@ function showToast(message) {
     t.className = "show";
     setTimeout(function () { t.className = t.className.replace("show", ""); }, 3000);
 }
+
+// ==== HATA BİLDİRİMLERİ (REPORTS) YÖNETİMİ ====
+
+// Tab Değiştirme Fonksiyonu
+window.switchAdminTab = function (tabName) {
+    const qSec = document.getElementById('questionsSection');
+    const rSec = document.getElementById('reportsSection');
+    const formSec = document.querySelector('.admin-card:nth-of-type(1)'); // Soru Ekleme Formu
+
+    document.getElementById('tab-questions').style.background = 'transparent';
+    document.getElementById('tab-questions').style.color = 'var(--navy)';
+    document.getElementById('tab-reports').style.background = 'transparent';
+    document.getElementById('tab-reports').style.color = 'var(--navy)';
+
+    if (tabName === 'questions') {
+        qSec.style.display = 'block';
+        if (formSec) formSec.style.display = 'block';
+        rSec.style.display = 'none';
+
+        document.getElementById('tab-questions').style.background = 'var(--navy)';
+        document.getElementById('tab-questions').style.color = 'white';
+        fetchQuestions();
+    } else if (tabName === 'reports') {
+        qSec.style.display = 'none';
+        if (formSec) formSec.style.display = 'none'; // Soru ekleme formunu gizle
+        rSec.style.display = 'block';
+
+        document.getElementById('tab-reports').style.background = 'var(--orange)';
+        document.getElementById('tab-reports').style.color = 'white';
+        loadReports();
+    }
+}
+
+// Raporları Firebase'den Çek
+async function loadReports() {
+    const tbody = document.getElementById('reportsTableBody');
+    const countEl = document.getElementById('totalReportsCount');
+
+    tbody.innerHTML = '<tr><td colspan="5" style="text-align: center;">Yükleniyor...</td></tr>';
+
+    try {
+        const querySnapshot = await getDocs(collection(db, "reports"));
+        tbody.innerHTML = '';
+
+        if (querySnapshot.empty) {
+            tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: #64748b;">Henüz hata bildirimi yok. Harika!</td></tr>';
+            countEl.innerText = "0";
+            return;
+        }
+
+        let reportCount = 0;
+        // Firebase Timestamp'e göre en yeniler en üste gelsin diye diziye atalım
+        let reportsArray = [];
+        querySnapshot.forEach(doc => {
+            const data = doc.data();
+            data.id = doc.id;
+            reportsArray.push(data);
+        });
+
+        // Yeniden eskiye sırala
+        reportsArray.sort((a, b) => {
+            if (!a.createdAt) return 1;
+            if (!b.createdAt) return -1;
+            return b.createdAt.seconds - a.createdAt.seconds;
+        });
+
+        reportsArray.forEach(data => {
+            reportCount++;
+            const tr = document.createElement('tr');
+
+            // Tarih formatı
+            let dateStr = "Tarih Yok";
+            if (data.createdAt && data.createdAt.seconds) {
+                const date = new Date(data.createdAt.seconds * 1000);
+                dateStr = date.toLocaleDateString('tr-TR') + ' ' + date.toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' });
+            }
+
+            // Eğer not yoksa "Belirtilmemiş" yazalım
+            const noteText = data.userNote ? data.userNote : '<span style="color:#cbd5e1; font-style:italic;">Belirtilmemiş</span>';
+
+            tr.innerHTML = `
+                <td><span style="font-size: 13px; color: #64748b;">${dateStr}</span></td>
+                <td><strong>${data.userEmail}</strong></td>
+                <td><span style="background: #fee2e2; color: #dc2626; padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: bold;">${data.errorType}</span></td>
+                <td>
+                    <div style="font-size: 13px; margin-bottom: 5px;">${noteText}</div>
+                    <div style="font-size: 11px; color: #94a3b8; font-family: monospace;">Soru ID: ${data.questionId}</div>
+                </td>
+                <td style="text-align: right;">
+                    <button class="btn-delete" onclick="deleteReport('${data.id}')" title="Raporu Sil/Çözüldü İşaretle">🗑️ Gizle</button>
+                </td>
+            `;
+            tbody.appendChild(tr);
+        });
+
+        countEl.innerText = reportCount;
+
+    } catch (err) {
+        console.error("Raporlar çekilirken hata:", err);
+        tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: red;">Veri çekilirken hata oluştu.</td></tr>';
+    }
+}
+
+// Rapor Silme Fonksiyonu
+window.deleteReport = async function (reportId) {
+    if (!confirm("Bu hata bildirimini silmek (veya çözüldü olarak işaretlemek) istediğinize emin misiniz?")) return;
+
+    try {
+        await deleteDoc(doc(db, "reports", reportId));
+        showToast("Bildirim başarıyla silindi. ✔️");
+        loadReports(); // Listeyi güncelle
+    } catch (err) {
+        console.error("Rapor silinirken hata:", err);
+        alert("Bildirim silinemedi: " + err.message);
+    }
+}

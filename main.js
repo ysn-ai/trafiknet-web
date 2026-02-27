@@ -284,6 +284,26 @@ function updateNavigationButtons() {
     const finishBtn = document.getElementById('finish-btn');
 
     navDiv.style.display = 'flex';
+    navDiv.style.alignItems = 'center';
+    navDiv.style.justifyContent = 'space-between';
+
+    // Hatalı Soru Bildir Butonunu Dinamik Ekle (Eğer yoksa)
+    let reportBtn = document.getElementById('btn-report-error');
+    if (!reportBtn) {
+        reportBtn = document.createElement('button');
+        reportBtn.id = 'btn-report-error';
+        reportBtn.className = 'btn-outline-small';
+        reportBtn.innerHTML = '⚠️ Hata Bildir';
+        reportBtn.style.borderColor = '#dc2626';
+        reportBtn.style.color = '#dc2626';
+        // En başa ekle
+        navDiv.insertBefore(reportBtn, prevBtn);
+    }
+
+    // Her güncellendiğinde aktif sorunun ID'sini alması için onclick güncelle
+    const activeQId = activeQuestions[currentQuestionIndex].id;
+    reportBtn.onclick = () => window.openReportModal(activeQId);
+
     prevBtn.style.display = currentQuestionIndex > 0 ? 'block' : 'none';
 
     if (currentQuestionIndex === activeQuestions.length - 1) {
@@ -634,3 +654,70 @@ window.toggleAccordion = function (headerElement) {
     // Tıklanan sekmeyi aç/kapat
     item.classList.toggle('active');
 };
+
+// ==== HATALI SORU BİLDİRİMİ EKRANI ====
+import { addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+window.openReportModal = function (questionId) {
+    document.getElementById('reportQuestionId').value = questionId;
+    document.getElementById('reportErrorType').value = 'Yanlış Cevap';
+    document.getElementById('reportUserNote').value = '';
+    document.getElementById('reportSuccessMsg').style.display = 'none';
+    document.getElementById('submitReportBtn').disabled = false;
+    document.getElementById('submitReportBtn').innerText = 'Gönder';
+
+    const modal = document.getElementById('reportModal');
+    if (modal) {
+        modal.style.display = 'block';
+        document.body.style.overflow = 'hidden';
+    }
+}
+
+window.closeReportModal = function () {
+    const modal = document.getElementById('reportModal');
+    if (modal) {
+        modal.style.display = 'none';
+        document.body.style.overflow = 'auto';
+    }
+}
+
+window.submitErrorReport = async function () {
+    const qId = document.getElementById('reportQuestionId').value;
+    const errType = document.getElementById('reportErrorType').value;
+    const note = document.getElementById('reportUserNote').value.trim();
+    const btn = document.getElementById('submitReportBtn');
+    const msgBlock = document.getElementById('reportSuccessMsg');
+
+    let userEmail = "Ziyaretçi";
+    if (window.auth && window.auth.currentUser) {
+        userEmail = window.auth.currentUser.email;
+    }
+
+    try {
+        btn.disabled = true;
+        btn.innerText = 'Gönderiliyor...';
+
+        await addDoc(collection(window.db, "reports"), {
+            questionId: qId,
+            userEmail: userEmail,
+            errorType: errType,
+            userNote: note,
+            status: 'Bekliyor', // Admin paneli için varsayılan durum
+            createdAt: serverTimestamp()
+        });
+
+        msgBlock.style.display = 'block';
+        btn.innerText = 'Gönderildi';
+
+        // 2 saniye sonra modalı kapat
+        setTimeout(() => {
+            closeReportModal();
+        }, 2000);
+
+    } catch (err) {
+        console.error("Hata bildirimi gönderilemedi:", err);
+        alert("Bir hata oluştu, lütfen internet bağlantınızı kontrol edip tekrar deneyin.");
+        btn.disabled = false;
+        btn.innerText = 'Tekrar Dene';
+    }
+}
