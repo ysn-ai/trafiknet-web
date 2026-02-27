@@ -52,7 +52,12 @@ document.addEventListener('DOMContentLoaded', () => {
         // URL'den kategori parametresini kontrol et
         const urlParams = new URLSearchParams(window.location.search);
         const kat = urlParams.get('kategori');
-        startNewQuiz(kat);
+
+        if (kat === 'mock') {
+            window.showPreExamScreen();
+        } else if (kat) {
+            startNewQuiz(kat);
+        }
     }
 });
 

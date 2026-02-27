@@ -25,7 +25,7 @@
                 <li id="navReturnHome" style="display: none;"><a href="#" onclick="closeProfile()">Ana Sayfaya Dön</a>
                 </li>
                 <li><a href="dersler.html">Ders Notları</a></li>
-                <li><a href="sinav.html">Deneme Sınavları</a></li>
+                <li><a href="sinav.html?kategori=mock">Deneme Sınavları</a></li>
                 <li><a href="#" class="btn-orange" id="loginNavBtn" onclick="openModal()">Giriş Yap</a></li>
             </ul>
         </div>
@@ -42,7 +42,7 @@
                     garantileyin.</p>
                 <div class="hero-btns animate-on-scroll">
                     <button class="btn-orange" style="padding: 15px 30px; font-size: 16px;"
-                        onclick="window.location.href='sinav.html'">Deneme Sınavı ➔</button>
+                        onclick="window.location.href='sinav.html?kategori=mock'">Deneme Sınavı ➔</button>
                     <button class="btn-outline"
                         style="padding: 15px 30px; font-size: 16px; border: 2px solid var(--orange); color: var(--orange);"
                         onclick="window.location.href='dersler.html'">Konu Bazlı Test Çöz</button>
@@ -251,7 +251,8 @@
                 </div>
 
                 <div class="profile-cta-buttons" style="display: flex; gap: 15px; margin-bottom: 25px;">
-                    <button class="btn-orange" style="flex:1;" onclick="window.location.href='sinav.html'">Deneme Çöz
+                    <button class="btn-orange" style="flex:1;"
+                        onclick="window.location.href='sinav.html?kategori=mock'">Deneme Çöz
                         ➔</button>
                     <button class="btn-outline" style="flex:1;" onclick="window.location.href='dersler.html'">Konu Testi
                         Seç ➔</button>
