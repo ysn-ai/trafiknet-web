@@ -115,6 +115,16 @@ onAuthStateChanged(window.auth, (user) => {
             welcomeText.textContent = `Merhaba, ${displayName} 👋`;
         }
 
+        // Admin Panel Butonu Yetki Kontrolü
+        const adminBtn = document.getElementById('adminPanelBtn');
+        if (adminBtn) {
+            if (user.email === 'yasin1413@gmail.com') {
+                adminBtn.style.display = 'block';
+            } else {
+                adminBtn.style.display = 'none';
+            }
+        }
+
         // Akıllı Alt Bilgi: Ücretsiz Kayıt Ol bölümünü gizle
         const pricingSection = document.getElementById('pricing');
         if (pricingSection) pricingSection.style.display = 'none';
