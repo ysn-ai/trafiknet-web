@@ -121,17 +121,43 @@ window.startNewQuiz = async function (secilenKategori = null) {
             return;
         }
 
-        // Filtrelenmiş veya tüm diziyi karıştır
-        let shuffled = [...fetchedQuestions].sort(() => 0.5 - Math.random());
+        // Fisher-Yates Shuffle Fonksiyonu
+        const shuffleArray = (array) => {
+            const arr = [...array];
+            for (let i = arr.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [arr[i], arr[j]] = [arr[j], arr[i]];
+            }
+            return arr;
+        };
 
-        // Kapasite limiti ayarı
-        let limit = 50;
-        if (window.currentUserRole === 'guest') {
-            limit = 15;
-            alert('Misafir kullanıcı olduğunuz için sınav 15 soru ile sınırlandırılmıştır.\nTam deneme için sağ üstten giriş yapabilirsiniz.');
+        if (isMockExam) {
+            // Mock Exam = Karma (Trafik 23, İlk Yardım 12, Motor 9, Adap 6)
+            const trafik = shuffleArray(fetchedQuestions.filter(q => q.kategori === 'Trafik ve Çevre Bilgisi')).slice(0, 23);
+            const ilkYardim = shuffleArray(fetchedQuestions.filter(q => q.kategori === 'İlk Yardım Bilgisi')).slice(0, 12);
+            const motor = shuffleArray(fetchedQuestions.filter(q => q.kategori === 'Araç Tekniği (Motor)')).slice(0, 9);
+            const adabi = shuffleArray(fetchedQuestions.filter(q => q.kategori === 'Trafik Adabı')).slice(0, 6);
+
+            // Hepsini birleştir ve en son sınav sıralaması için test boyunca karışık olması için bir kez daha karıştır
+            activeQuestions = shuffleArray([...trafik, ...ilkYardim, ...motor, ...adabi]);
+        } else {
+            // Kategori Testi
+            let shuffled = shuffleArray(fetchedQuestions);
+            let limit = 50;
+            if (secilenKategori === 'Trafik ve Çevre Bilgisi') limit = 23;
+            else if (secilenKategori === 'İlk Yardım Bilgisi') limit = 12;
+            else if (secilenKategori === 'Araç Tekniği (Motor)') limit = 9;
+            else if (secilenKategori === 'Trafik Adabı') limit = 6;
+
+            // Kategorisine göre limiti ayarla ve diziyi kes
+            activeQuestions = shuffled.slice(0, limit);
         }
 
-        activeQuestions = shuffled.slice(0, limit);
+        // Misafir Kullanıcı Sınırı
+        if (window.currentUserRole === 'guest') {
+            activeQuestions = activeQuestions.slice(0, 15);
+            alert('Misafir kullanıcı olduğunuz için sınav 15 soru ile sınırlandırılmıştır.\\nTam deneme için sağ üstten giriş yapabilirsiniz.');
+        }
         currentQuestionIndex = 0;
         score = 0;
         correctCount = 0;
@@ -489,10 +515,17 @@ window.showResultScreen = function () {
     document.getElementById('result-screen').style.display = 'block';
 }
 
-window.restartQuiz = function () {
+window.restartExam = function () {
+    // Sınavı sıfırla ve yeniden başlat (mevcut kategoriyi ya da mock modunu kullanarak)
     document.getElementById('result-screen').style.display = 'none';
-    document.getElementById('quiz-screen').style.display = 'block';
-    startNewQuiz(currentKategori); // Mevcut kategoriyle (varsa) yeniden başlat
+    document.getElementById('review-screen').style.display = 'none';
+
+    // Geçen mod hangisiyse, ona göre tekrar çağır
+    if (isMockExam) {
+        startNewQuiz('mock');
+    } else {
+        startNewQuiz(currentKategori);
+    }
 }
 
 // Modaller ve Kaydırma
