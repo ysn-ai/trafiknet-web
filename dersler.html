@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ders Notları | TrafikNet</title>
+    <link rel="icon" type="image/png" href="app_icon.png?v=1">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        /* Bu sayfaya özel stiller - Mevcut style.css ile uyumlu */
+        body {
+            background-color: #f1f5f9;
+        }
+
+        .lessons-accordion {
+            max-width: 800px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .accordion-item {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            border-left: 5px solid var(--navy);
+            transition: 0.3s;
+        }
+
+        .accordion-header {
+            padding: 20px 25px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            user-select: none;
+            transition: background 0.2s;
+        }
+
+        .accordion-header:hover {
+            background: #f8fafc;
+        }
+
+        .accordion-header h3 {
+            font-size: 18px;
+            color: var(--navy);
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .accordion-icon {
+            font-size: 20px;
+            transition: transform 0.3s;
+            color: var(--orange);
+        }
+
+        .accordion-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out, padding 0.3s ease;
+            background: white;
+            padding: 0 25px;
+        }
+
+        .accordion-item.active {
+            border-left-color: var(--orange);
+        }
+
+        .accordion-item.active .accordion-content {
+            max-height: 500px;
+            /* İçeriğe göre ayarlanabilir */
+            padding: 10px 25px 30px 25px;
+            border-top: 1px solid #f1f5f9;
+        }
+
+        .accordion-item.active .accordion-icon {
+            transform: rotate(180deg);
+        }
+
+        .lesson-note-card {
+            background: #f8fafc;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+            border-left: 3px solid var(--orange);
+            font-size: 14px;
+            line-height: 1.6;
+        }
+    </style>
+</head>
+
+<body>
+
+    <nav class="navbar">
+        <div class="container nav-box">
+            <div class="logo-container" style="cursor: pointer;" onclick="window.location.href='index.html'">
+                <img src="app_icon.png" alt="TrafikNet Logo" class="logo-img">
+                <div class="logo-text">Trafik<span>Net</span></div>
+            </div>
+            <ul class="nav-links">
+                <!-- Sadece logo üzerinden dönebilir (Navbar temizliği) -->
+            </ul>
+        </div>
+    </nav>
+
+    <section class="container section-padding">
+        <h2 class="section-title">Eğitim <span class="orange-text">İçerikleri</span></h2>
+
+        <div class="lessons-accordion">
+            <!-- İlk Yardım -->
+            <div class="accordion-item" id="ilk-yardim">
+                <div class="accordion-header" onclick="toggleAccordion(this)">
+                    <h3><span class="icon">🚑</span> İlk Yardım Bilgisi</h3>
+                    <span class="accordion-icon">▼</span>
+                </div>
+                <div class="accordion-content">
+                    <div class="lesson-content" style="line-height: 1.8; color: var(--text);">
+                        <p>İlk yardım, kaza veya yaşamı tehlikeye düşüren durumlarda, sağlık görevlilerinin yardımı
+                            sağlanıncaya kadar lüzumlu araç gereçlerle yapılan ilaçsız uygulamalardır.</p>
+
+                        <h4 style="color: var(--navy); margin-top: 15px; margin-bottom: 5px;">İlk Yardımın Temel
+                            Uygulamaları (KBK)</h4>
+                        <ul style="margin-left: 20px; list-style-type: square; margin-bottom: 15px;">
+                            <li><strong>Koruma:</strong> Olay yerinde olası tehlikeleri belirleyerek güvenli bir çevre
+                                oluşturmaktır.</li>
+                            <li><strong>Bildirme:</strong> En hızlı şekilde 112 Acil Servis'e haber verilmelidir.</li>
+                            <li><strong>Kurtarma (Müdahale):</strong> Olay yerindeki yaralılara hızlı ancak sakin ve
+                                bilinçli müdahaledir.</li>
+                        </ul>
+
+                        <h4 style="color: var(--navy); margin-top: 15px; margin-bottom: 5px;">İlk Yardımın ABC'si</h4>
+                        <ul style="margin-left: 20px; margin-bottom: 15px;">
+                            <li><strong>A (Airway):</strong> Solunum yolu açıklığının değerlendirilmesi.</li>
+                            <li><strong>B (Breathing):</strong> Solunumun değerlendirilmesi (Bak-Dinle-Hisset).</li>
+                            <li><strong>C (Circulation):</strong> Dolaşımın değerlendirilmesi (Kalp masajı).</li>
+                        </ul>
+
+                        <h4 style="color: var(--navy); margin-top: 15px; margin-bottom: 5px;">Kritik Manevralar</h4>
+                        <ul style="margin-left: 20px; margin-bottom: 15px;">
+                            <li><strong>Temel Yaşam Desteği:</strong> Yetişkinlerde 30 kalp masajı / 2 suni solunum
+                                (30:2) uygulanır.</li>
+                            <li><strong>Heimlich Manevrası:</strong> Tam tıkanma (nefes alamama, morarma) durumlarında
+                                sırta vurma ve karına bası (Heimlich) uygulanır.</li>
+                            <li><strong>Koma Pozisyonu:</strong> Bilinci kapalı ancak solunumu olan hastalara verilen
+                                yan yatış pozisyonudur.</li>
+                            <li><strong>Şok Pozisyonu:</strong> Sırt üstü yatırılan hastanın ayaklarının 30 cm yukarı
+                                kaldırılmasıdır.</li>
+                        </ul>
+
+                        <div class="lesson-note-card">
+                            <strong>⚠️ Sınav Notu:</strong> Turnike uygulaması, ancak uzuv kopması veya çok sayıda
+                            yaralının olduğu ve tek bir ilk yardımcının bulunduğu durumlarda uygulanır. İpe, tele veya
+                            ince lastiğe turnike yapılmaz.
+                        </div>
+                        <div class="lesson-actions" style="margin-top: 20px;">
+                            <a href="sinav.html?kategori=İlk Yardım Bilgisi" class="btn-orange btn-small"
+                                style="font-size: 14px; padding: 10px 20px;">Konu Testini Çöz</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Motor ve Araç Tekniği -->
+            <div class="accordion-item" id="motor">
+                <div class="accordion-header" onclick="toggleAccordion(this)">
+                    <h3><span class="icon">⚙️</span> Motor ve Araç Tekniği</h3>
+                    <span class="accordion-icon">▼</span>
+                </div>
+                <div class="accordion-content">
+                    <div class="lesson-content" style="line-height: 1.8; color: var(--text);">
+                        <p>Araç motorunun çalışma prensipleri, göstergeler ve temel bakım bilgileri aracın güvenli ve
+                            uzun ömürlü kullanımı için hayati önem taşır.</p>
+
+                        <h4 style="color: var(--navy); margin-top: 15px; margin-bottom: 5px;">Gösterge Paneli Uyarı
+                            Işıkları</h4>
+                        <ul style="margin-left: 20px; list-style-type: square; margin-bottom: 15px;">
+                            <li><strong>Yağ Lambası:</strong> Yandığında motor yağ basıncı çok düşmüştür. <em>Motor
+                                    hemen durdurulmalıdır.</em></li>
+                            <li><strong>Hararet Lambası:</strong> Motor soğutma suyu sıcaklığının çok arttığını
+                                gösterir. <em>Araç güvenli bir şekilde durdurulmalı ve rölantide çalıştırılarak soğuması
+                                    beklenmelidir (veya durdurulmalıdır).</em></li>
+                            <li><strong>Şarj (Akü) Lambası:</strong> Alternatörün aküyü şarj etmediğini gösterir.
+                                <em>Kısa sürede motor durdurulmalıdır.</em>
+                            </li>
+                        </ul>
+
+                        <h4 style="color: var(--navy); margin-top: 15px; margin-bottom: 5px;">Araca Binmeden Önce
+                            Kontroller (Günlük)</h4>
+                        <ul style="margin-left: 20px; margin-bottom: 15px;">
+                            <li>Lastik basınçları ve diş derinlikleri (Gözle kontrol edilir)</li>
+                            <li>Araç altında sıvı kaçağı (yağ, su vb.) olup olmadığı</li>
+                            <li>Silecek lastikleri ve aynalar</li>
+                        </ul>
+
+                        <h4 style="color: var(--navy); margin-top: 15px; margin-bottom: 5px;">Lastik Değiştirme Sırası
+                        </h4>
+                        <ol style="margin-left: 20px; margin-bottom: 15px;">
+                            <li>Aracın güvenli yere alınması ve el freninin çekilmesi (Reflektör konulması).</li>
+                            <li>Bijon somunlarının gevşetilmesi (Jant kapağı çıkarıldıktan sonra).</li>
+                            <li>Aracın kriko ile kaldırılması.</li>
+                            <li>Bijon somunlarının tamamen sökülüp lastiğin çıkarılması ve yedek lastiğin (stepne)
+                                takılması.</li>
+                        </ol>
+
+                        <div class="lesson-note-card">
+                            <strong>💡 Sınav Notu:</strong> Kış lastikleri, sıcaklık 7°C'nin altına düştüğünde
+                            takılmalıdır. 1 Aralık - 1 Nisan tarihleri arası kış lastiği uygulaması zorunludur.
+                        </div>
+                        <div class="lesson-actions" style="margin-top: 20px;">
+                            <a href="sinav.html?kategori=Araç Tekniği (Motor)" class="btn-orange btn-small"
+                                style="font-size: 14px; padding: 10px 20px;">Konu Testini Çöz</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Trafik ve Çevre Bilgisi -->
+            <div class="accordion-item" id="trafik">
+                <div class="accordion-header" onclick="toggleAccordion(this)">
+                    <h3><span class="icon">🛣️</span> Trafik ve Çevre Bilgisi</h3>
+                    <span class="accordion-icon">▼</span>
+                </div>
+                <div class="accordion-content">
+                    <div class="lesson-content" style="line-height: 1.8; color: var(--text);">
+                        <p>Trafikte düzeni ve can güvenliğini sağlamak için konulan tüm kurallara uyulması zorunludur.
+                        </p>
+
+                        <h4 style="color: var(--navy); margin-top: 15px; margin-bottom: 5px;">Kavşaklarda Geçiş
+                            Üstünlüğü Kuralları</h4>
+                        <ul style="margin-left: 20px; list-style-type: square; margin-bottom: 15px;">
+                            <li>Bütün sürücüler, geçiş üstünlüğüne sahip araçlara (Cankurtaran, İtfaiye, Polis, Sivil
+                                Savunma) yol vermek zorundadır.</li>
+                            <li>Kavşaktaki şartlar ne olursa olsun, ana yoldaki sürücü geçiş hakkına sahiptir.</li>
+                            <li>Kontrolsüz kavşaklarda, herkes sağından gelen araca yol vermek zorundadır.</li>
+                            <li>Dönüş yapan araçlar, düz giden araçlara yol vermelidir.</li>
+                        </ul>
+
+                        <h4 style="color: var(--navy); margin-top: 15px; margin-bottom: 5px;">Hız Sınırları ve Takip
+                            Mesafesi</h4>
+                        <ul style="margin-left: 20px; margin-bottom: 15px;">
+                            <li><strong>Takip Mesafesi:</strong> Aracın km/saat cinsinden hızının yarısı kadar metredir.
+                                (Örn: 90 km/s hızla giden araç için takip mesafesi 45 metredir).</li>
+                            <li>Tehlikeli madde taşıyan araçlar, öndeki aracı <em>hiçbir şartta 50 metreden daha
+                                    yakın</em> takip edemezler.</li>
+                            <li>Yerleşim yeri içindeki hız sınırı otomobiller için genelde 50 km/s'dir.</li>
+                        </ul>
+
+                        <h4 style="color: var(--navy); margin-top: 15px; margin-bottom: 5px;">Asli (Tam) Kusur Sayılan
+                            Haller</h4>
+                        <ul style="margin-left: 20px; margin-bottom: 15px;">
+                            <li>Kırmızı ışıkta ve yetkili memurun dur işaretinde geçmek.</li>
+                            <li>Taşıt giremez işareti olan yola veya tek yönlü yola ters taraftan girmek.</li>
+                            <li>Karşı şeride tecavüz etmek ve arkadan çarpmak.</li>
+                            <li>Kavşaklarda geçiş önceliği kuralına uymamak.</li>
+                        </ul>
+
+                        <div class="lesson-note-card">
+                            <strong>🚫 Çevre Notu:</strong> Katalitik konvertör, egzoz gazındaki zehirli maddeleri
+                            azaltmak için kullanılır. Kurşunsuz benzin kullanılan araçlarda bulunur.
+                        </div>
+                        <div class="lesson-actions" style="margin-top: 20px;">
+                            <a href="sinav.html?kategori=Trafik ve Çevre Bilgisi" class="btn-orange btn-small"
+                                style="font-size: 14px; padding: 10px 20px;">Konu Testini Çöz</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Trafik Adabı -->
+            <div class="accordion-item" id="adabi">
+                <div class="accordion-header" onclick="toggleAccordion(this)">
+                    <h3><span class="icon">🤝</span> Trafik Adabı</h3>
+                    <span class="accordion-icon">▼</span>
+                </div>
+                <div class="accordion-content">
+                    <div class="lesson-content" style="line-height: 1.8; color: var(--text);">
+                        <p>Trafik kurallarının hukuki zorunluluğu dışında, trafikteki diğer sürücülere ve yayalara
+                            gösterilmesi gereken yazılı olmayan etik kurallar bütünüdür.</p>
+
+                        <h4 style="color: var(--navy); margin-top: 15px; margin-bottom: 5px;">Temel Değerler</h4>
+                        <ul style="margin-left: 20px; list-style-type: square; margin-bottom: 15px;">
+                            <li><strong>Empati ve Hoşgörü:</strong> Başka bir sürücünün yaptığı hataya öfkeyle değil,
+                                anlayışla (hoşgörü) yaklaşmak ve durumu tırmandırmamak trafik adabının temelidir.</li>
+                            <li><strong>Ferahgat ve Fedakarlık:</strong> Haklı olduğunuz bir durumda bile sırf trafik
+                                sıkışmasın veya kaza olmasın diye hakkınızdan feragat etmenizdir.</li>
+                            <li><strong>Sorumluluk Bilinci:</strong> Yaptığınız hatalı bir hareketin sadece sizi değil,
+                                trafikteki innocent(suçsuz) diğer insanları da ölümcül riske attığını bilmektir.</li>
+                        </ul>
+
+                        <h4 style="color: var(--navy); margin-top: 15px; margin-bottom: 5px;">Öfke Kontrolü</h4>
+                        <ul style="margin-left: 20px; margin-bottom: 15px;">
+                            <li>Öfke, sürücünün dikkatini dağıtır, reflekslerini yavaşlatır ve saldırgan sürüşe (Agresif
+                                sürüş) neden olur.</li>
+                            <li>Öfkelendiğinizde derin nefes almak, sakinleştirici müzik dinlemek ve odak noktanızı yola
+                                vermek kazaları önler.</li>
+                        </ul>
+
+                        <h4 style="color: var(--navy); margin-top: 15px; margin-bottom: 5px;">Dezavantajlı Gruplara
+                            Saygı</h4>
+                        <ul style="margin-left: 20px; margin-bottom: 15px;">
+                            <li>Yaşlılara, çocuklara, hamilelere ve engellilere karşı trafikte her zaman ekstra tolerans
+                                ve öncelik tanınmalıdır.</li>
+                            <li>Engelli park yerlerine sağlıklı bireylerin park etmesi sadece kural ihlali değil, ciddi
+                                bir trafik adabı eksikliğidir.</li>
+                        </ul>
+
+                        <div class="lesson-note-card">
+                            <strong>🛑 Etik Not:</strong> Aracınızla su birikintisinden geçerken yayalara su sıçratmamak
+                            için yavaşlamak, trafik adabının getirdiği büyük bir nezakettir.
+                        </div>
+                        <div class="lesson-actions" style="margin-top: 20px;">
+                            <a href="sinav.html?kategori=Trafik Adabı" class="btn-orange btn-small"
+                                style="font-size: 14px; padding: 10px 20px;">Konu Testini Çöz</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        function toggleAccordion(header) {
+            const item = header.parentElement;
+            const content = item.querySelector('.accordion-content');
+            const isActive = item.classList.contains('active');
+
+            // Diğer açık olanları kapat (Opsiyonel: Tekli açılım için)
+            document.querySelectorAll('.accordion-item').forEach(i => {
+                i.classList.remove('active');
+                i.querySelector('.accordion-content').style.maxHeight = null;
+            });
+
+            if (!isActive) {
+                item.classList.add('active');
+                content.style.maxHeight = content.scrollHeight + 30 + "px"; // 30px is for extra padding
+            }
+        }
+    </script>
+</body>
+
+</html>

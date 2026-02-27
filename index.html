@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TrafikNet | Profesyonel Ehliyet Hazırlık</title>
+    <link rel="icon" type="image/png" href="app_icon.png?v=1">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap"
+        rel="stylesheet">
+    <!-- Chart.js for Profile Dashboard -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <nav class="navbar">
+        <div class="container nav-box">
+            <div class="logo-container">
+                <img src="app_icon.png" alt="TrafikNet Logo" class="logo-img">
+                <div class="logo-text">Trafik<span>Net</span></div>
+            </div>
+            <ul class="nav-links">
+                <li id="navReturnHome" style="display: none;"><a href="#" onclick="closeProfile()">Ana Sayfaya Dön</a>
+                </li>
+                <li><a href="dersler.html">Ders Notları</a></li>
+                <li><a href="sinav.html">Deneme Sınavları</a></li>
+                <li><a href="#" class="btn-orange" id="loginNavBtn" onclick="openModal()">Giriş Yap</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Ana Sayfa Görünümü -->
+    <div id="mainView">
+        <header class="hero">
+            <div class="container">
+                <h1 class="animate-on-scroll">Ehliyet Sınavına <br><span class="orange-text">Profesyonel
+                        Hazırlık.</span>
+                </h1>
+                <p class="animate-on-scroll">Karışık soru çözme modülleri ve en güncel ders notlarıyla başarıyı
+                    garantileyin.</p>
+                <div class="hero-btns animate-on-scroll">
+                    <button class="btn-orange" style="padding: 15px 30px; font-size: 16px;"
+                        onclick="window.location.href='sinav.html'">Ücretsiz Test Çöz ➔</button>
+                    <button class="btn-outline" style="padding: 13px 30px; font-size: 16px;"
+                        onclick="window.location.href='dersler.html'">Ders Notlarını Oku</button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Neden Biz? Özellikler -->
+        <section class="features-section section-padding">
+            <div class="container">
+                <h2 class="section-title">Neden <span class="orange-text">Biz?</span></h2>
+                <div class="features-grid">
+                    <!-- Dinamik Soru -->
+                    <div class="feature-card animate-on-scroll">
+                        <div class="feature-icon">
+                            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#FF851B"
+                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                <polyline points="7 10 12 15 17 10"></polyline>
+                                <line x1="12" y1="15" x2="12" y2="3"></line>
+                            </svg>
+                        </div>
+                        <h3>Dinamik Soru Havuzu</h3>
+                        <p>Sürekli güncellenen 1000'den fazla soru ile MEB müfredatına birebir uyumlu testler çözün.</p>
+                    </div>
+                    <!-- Başarı Hedefi -->
+                    <div class="feature-card animate-on-scroll">
+                        <div class="feature-icon">
+                            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#FF851B"
+                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <circle cx="12" cy="12" r="6"></circle>
+                                <circle cx="12" cy="12" r="2"></circle>
+                            </svg>
+                        </div>
+                        <h3>Başarı Hedefi</h3>
+                        <p>Detaylı analizler ve eksik konu tespiti ile %100 başarıya odaklanın.</p>
+                    </div>
+                    <!-- Sınav Simülasyonu -->
+                    <div class="feature-card animate-on-scroll">
+                        <div class="feature-icon">
+                            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#FF851B"
+                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                                <line x1="3" y1="9" x2="21" y2="9"></line>
+                                <line x1="9" y1="21" x2="9" y2="9"></line>
+                            </svg>
+                        </div>
+                        <h3>Sınav Simülasyonu</h3>
+                        <p>Gerçek sınav stresini yenmek için süre kısıtlamalı, birebir ehliyet sınavı deneyimi yaşayın.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Bölüm B: Nasıl Çalışır -->
+        <section class="steps-section">
+            <div class="container">
+                <h2 class="section-title">3 Adımda Başarıya Ulaşın</h2>
+                <div class="steps-grid">
+                    <div class="step-card animate-on-scroll">
+                        <div class="step-number">1</div>
+                        <h3>Ücretsiz Kayıt Ol</h3>
+                        <p>Sisteme anında kayıt olarak ilerlemenizi kaydedin ve size özel analizleri görün.</p>
+                    </div>
+                    <div class="step-card animate-on-scroll">
+                        <div class="step-number">2</div>
+                        <h3>Ders Notlarına Çalış</h3>
+                        <p>Alanında uzman eğitmenler tarafından hazırlanmış güncel ders notlarını inceleyin.</p>
+                    </div>
+                    <div class="step-card animate-on-scroll">
+                        <div class="step-number">3</div>
+                        <h3>Sınavı Geç</h3>
+                        <p>Bol bol deneme çözerek eksiklerinizi giderin ve ehliyetinizi ilk seferde alın.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="dersler" class="container section-padding">
+            <h2 class="section-title">Hızlı Ders Notları</h2>
+            <div class="grid-lessons">
+                <div class="lesson-card animate-on-scroll">
+                    <div class="icon">🚑</div>
+                    <h3>İlk Yardım</h3>
+                    <p>Acil durumlarda hayat kurtaran müdahaleler ve temel kurallar.</p>
+                    <div class="lesson-actions">
+                        <a href="sinav.html?kategori=İlk Yardım Bilgisi" class="btn-orange btn-small">Testi Çöz</a>
+                        <a href="dersler.html#ilk-yardim" class="btn-outline-small">Ders Notu</a>
+                    </div>
+                </div>
+
+                <div class="lesson-card animate-on-scroll">
+                    <div class="icon">⚙️</div>
+                    <h3>Motor Bilgisi</h3>
+                    <p>Araç tekniği, motor aksamları ve temel bakım bilgileri.</p>
+                    <div class="lesson-actions">
+                        <a href="sinav.html?kategori=Araç Tekniği (Motor)" class="btn-orange btn-small">Testi Çöz</a>
+                        <a href="dersler.html#motor" class="btn-outline-small">Ders Notu</a>
+                    </div>
+                </div>
+
+                <div class="lesson-card animate-on-scroll">
+                    <div class="icon">🚦</div>
+                    <h3>Trafik ve Çevre</h3>
+                    <p>Trafik kuralları, tabelalar, hız sınırları ve çevre bilgisi.</p>
+                    <div class="lesson-actions">
+                        <a href="sinav.html?kategori=Trafik ve Çevre Bilgisi" class="btn-orange btn-small">Testi Çöz</a>
+                        <a href="dersler.html#trafik" class="btn-outline-small">Ders Notu</a>
+                    </div>
+                </div>
+
+                <div class="lesson-card animate-on-scroll">
+                    <div class="icon">🤝</div>
+                    <h3>Trafik Adabı</h3>
+                    <p>Trafikte saygı, nezaket ve güvenli sürüş psikolojisi.</p>
+                    <div class="lesson-actions">
+                        <a href="sinav.html?kategori=Trafik Adabı" class="btn-orange btn-small">Testi Çöz</a>
+                        <a href="dersler.html#adabi" class="btn-outline-small">Ders Notu</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Üyelik Planları (Pricing Table) -->
+        <section id="pricing" class="pricing-section">
+            <div class="container">
+                <h2 class="section-title">Size Uygun <span class="orange-text">Başarı Paketi</span></h2>
+                <div class="pricing-grid">
+                    <!-- Misafir -->
+                    <div class="pricing-card animate-on-scroll">
+                        <div class="pricing-header">
+                            <h3>Misafir</h3>
+                            <div class="pricing-price">Ücretsiz</div>
+                        </div>
+                        <ul class="pricing-features">
+                            <li>1 Adet Deneme Sınavı</li>
+                            <li>15 Soru Sınırı (Kısıtlı)</li>
+                            <li>Temel Ders Notları</li>
+                            <li class="disabled">İlerleme Kaydı</li>
+                            <li class="disabled">Performans Analizi</li>
+                        </ul>
+                        <a href="sinav.html" class="btn-outline">Hemen Çöz</a>
+                    </div>
+
+                    <!-- Ücretsiz Üye -->
+                    <div class="pricing-card animate-on-scroll">
+                        <div class="pricing-header">
+                            <h3>Ücretsiz Üye</h3>
+                            <div class="pricing-price">0 TL <span>/ Ay</span></div>
+                        </div>
+                        <ul class="pricing-features">
+                            <li>Günlük 1 Deneme Sınavı</li>
+                            <li>50 Soru (Tam Sınav)</li>
+                            <li>İlerleme Kaydı</li>
+                            <li>Hata Analizi (Temel)</li>
+                            <li class="disabled">Rakip Sıralaması</li>
+                        </ul>
+                        <button class="btn-orange" onclick="openModal()">Ücretsiz Kayıt Ol</button>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+    </div> <!-- /#mainView -->
+
+    <!-- Tam Sayfa Profil Alanı Dashboard -->
+    <section id="profileSection" style="display:none;" class="section-padding profile-dashboard">
+        <div class="container profile-dashboard-layout">
+            <!-- Sol Menü / Profil Kartı -->
+            <div class="profile-sidebar">
+                <div class="profile-avatar">👤</div>
+                <h3 id="welcomeUserText" class="profile-name">Merhaba, Öğrenci 👋</h3>
+                <p class="profile-status">TrafikNet Öğrencisi</p>
+                <div class="profile-actions">
+                    <button class="btn-outline-small" onclick="alert('Hesap ayarları yakında eklenecek!')"
+                        style="width:100%; margin-bottom: 10px;">⚙️ Hesap Ayarları</button>
+                    <button class="btn-orange btn-small" onclick="handleLogout()" style="width:100%;">🚪 Çıkış
+                        Yap</button>
+                </div>
+            </div>
+
+            <!-- Sağ Dashboard İçeriği -->
+            <div class="profile-main">
+                <div class="profile-header-text" style="margin-bottom: 25px;">
+                    <h2 style="font-size: 24px; color: var(--navy); margin-bottom: 5px;">Eğitim İstatistikleri</h2>
+                    <p style="color: var(--text-light);">Buradan tüm ilerlemeni takip edebilirsin.</p>
+                </div>
+
+                <!-- 3'lü Kart Izgarası -->
+                <div class="profile-stats-grid">
+                    <div class="profile-stat-card">
+                        <div class="stat-icon">📝</div>
+                        <div class="stat-info">
+                            <h3 id="solvedCount">0</h3>
+                            <p>Çözülen Soru</p>
+                        </div>
+                    </div>
+                    <div class="profile-stat-card">
+                        <div class="stat-icon">🎯</div>
+                        <div class="stat-info">
+                            <h3 id="successRate">%0</h3>
+                            <p>Doğru Oranı</p>
+                        </div>
+                    </div>
+                    <div class="profile-stat-card">
+                        <div class="stat-icon">🏆</div>
+                        <div class="stat-info">
+                            <h3 id="completedExams">0</h3>
+                            <p>Bitirilen Deneme</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Analiz Grafiği -->
+                <div class="profile-chart-container"
+                    style="background: white; border-radius: 12px; padding: 25px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); margin-top: 30px; border: 1px solid var(--border);">
+                    <h3 style="margin-top: 0; color: var(--navy); font-size: 18px; margin-bottom: 25px;">Derslere Göre
+                        Başarı Analizi</h3>
+                    <div class="chart-wrapper" style="position: relative; height:300px; width:100%;">
+                        <canvas id="successChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div id="loginModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeModal()">&times;</span>
+
+            <!-- Giriş Yap Formu -->
+            <div id="loginFormContainer" class="auth-form-container">
+                <div class="modal-header" style="margin-bottom: 20px;">
+                    <h2>Giriş Yap</h2>
+                </div>
+                <div class="input-group">
+                    <label>E-posta</label>
+                    <input type="email" id="loginEmail" placeholder="E-posta adresiniz">
+                </div>
+                <div class="input-group">
+                    <label>Şifre</label>
+                    <input type="password" id="loginPassword" placeholder="Şifreniz">
+                </div>
+                <div style="text-align: right; margin-bottom: 20px;">
+                    <a href="#" onclick="toggleAuth('forgotPassword')"
+                        style="color: var(--text-light); font-size: 13px; text-decoration: underline;">Şifremi
+                        Unuttum</a>
+                </div>
+                <button id="loginBtn" class="btn-main" style="width: 100%; margin-bottom: 20px;">Giriş Yap</button>
+                <div style="text-align: center; font-size: 14px; margin-top: 15px;">
+                    Hesabın yok mu? <a href="#" onclick="toggleAuth('register')"
+                        style="color: var(--orange); font-weight: 700; text-decoration: none;">Hemen Kayıt Ol</a>
+                </div>
+            </div>
+
+            <!-- Kayıt Ol Formu -->
+            <div id="registerFormContainer" class="auth-form-container" style="display: none;">
+                <div class="modal-header" style="margin-bottom: 20px;">
+                    <h2>Kayıt Ol</h2>
+                </div>
+                <div class="input-group">
+                    <label>Ad Soyad</label>
+                    <input type="text" id="registerName" placeholder="Adınız ve Soyadınız">
+                </div>
+                <div class="input-group">
+                    <label>E-posta</label>
+                    <input type="email" id="registerEmail" placeholder="E-posta adresiniz">
+                </div>
+                <div class="input-group">
+                    <label>Şifre</label>
+                    <input type="password" id="registerPassword" placeholder="Şifreniz">
+                </div>
+                <div class="input-group">
+                    <label>Şifre (Tekrar)</label>
+                    <input type="password" id="registerPasswordConfirm" placeholder="Şifrenizi tekrar giriniz">
+                </div>
+                <button id="registerBtn" class="btn-outline" style="width: 100%; margin-bottom: 20px;">Kayıt Ol</button>
+                <div style="text-align: center; font-size: 14px; margin-top: 15px;">
+                    Zaten hesabın var mı? <a href="#" onclick="toggleAuth('login')"
+                        style="color: var(--orange); font-weight: 700; text-decoration: none;">Giriş Yap</a>
+                </div>
+            </div>
+
+            <!-- Şifremi Unuttum Formu -->
+            <div id="forgotPasswordFormContainer" class="auth-form-container" style="display: none;">
+                <div class="modal-header" style="margin-bottom: 20px;">
+                    <h2>Şifremi Unuttum</h2>
+                    <p style="font-size: 14px; color: var(--text-light); margin-top: 10px;">E-posta adresinizi girin,
+                        size şifre sıfırlama bağlantısı gönderelim.</p>
+                </div>
+                <div class="input-group">
+                    <label>E-posta</label>
+                    <input type="email" id="resetEmail" placeholder="E-posta adresiniz">
+                </div>
+                <button id="resetPasswordBtn" class="btn-main" style="width: 100%; margin-bottom: 20px;">Bağlantı
+                    Gönder</button>
+                <div style="text-align: center; font-size: 14px; margin-top: 15px;">
+                    <a href="#" onclick="toggleAuth('login')"
+                        style="color: var(--orange); font-weight: 700; text-decoration: none;">Giriş Yap'a Dön</a>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script type="module" src="main.js"></script>
+    <script type="module" src="auth.js"></script>
+</body>
+
+</html>
