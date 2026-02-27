@@ -510,9 +510,55 @@ body {
     margin-bottom: 15px;
 }
 
-.step-card p {
-    color: #64748b;
-    line-height: 1.6;
+color: #64748b;
+line-height: 1.6;
+}
+
+/* --- Avukatın Notu Section --- */
+.lawyer-section {
+    padding: 80px 0;
+    background-color: var(--bg);
+}
+
+.lawyer-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 30px;
+    margin-top: 50px;
+}
+
+.lawyer-card {
+    background: white;
+    padding: 30px;
+    border-radius: 16px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+    transition: all 0.3s ease;
+    border: 1px solid rgba(0, 0, 0, 0.03);
+    position: relative;
+    display: flex;
+    flex-direction: column;
+}
+
+.lawyer-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+}
+
+.lawyer-card h3 {
+    color: var(--navy);
+    margin-bottom: 15px;
+    font-size: 18px;
+    font-weight: 700;
+    line-height: 1.4;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.lawyer-card p {
+    color: #475569;
+    line-height: 1.7;
+    font-size: 15px;
 }
 
 /* Premium Banner ... (devamı aynen kalıyor) */
