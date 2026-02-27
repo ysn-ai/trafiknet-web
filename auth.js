@@ -1,6 +1,6 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut, sendEmailVerification, updateProfile, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-import { getFirestore, doc, setDoc, updateDoc, increment, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+import { getFirestore, doc, setDoc, updateDoc, increment, getDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
 const firebaseConfig = {
     apiKey: "AIzaSyBZHdbR7hGeeTZyPBzPOdjZBjxtZlH-KA0",
@@ -84,6 +84,7 @@ window.handleLogout = async function () {
         await signOut(window.auth);
 
         // Yerel Veri / State Temizliği
+        if (window.statsUnsubscribe) { window.statsUnsubscribe(); }
         localStorage.clear();
         sessionStorage.clear();
 
@@ -128,6 +129,11 @@ onAuthStateChanged(window.auth, (user) => {
         // Akıllı Alt Bilgi: Ücretsiz Kayıt Ol bölümünü gizle
         const pricingSection = document.getElementById('pricing');
         if (pricingSection) pricingSection.style.display = 'none';
+
+        // İstatistikleri Dinle (Dashboard)
+        if (typeof window.fetchProfileStats === 'function') {
+            window.fetchProfileStats();
+        }
 
     } else {
         if (loginLink) {
@@ -239,30 +245,47 @@ window.saveExamResult = async function (correctInc, totalInExam) {
     }
 };
 
-window.fetchProfileStats = async function () {
+window.statsUnsubscribe = null;
+
+window.fetchProfileStats = function () {
     if (!window.auth.currentUser) return;
     const uid = window.auth.currentUser.uid;
     const userRef = doc(window.db, "users", uid);
 
     try {
-        const docSnap = await getDoc(userRef);
-        if (docSnap.exists()) {
-            const data = docSnap.data();
-            const solved = data.solvedCount || 0;
-            const correct = data.correctCount || 0;
-            const exams = data.completedExams || 0;
+        if (window.statsUnsubscribe) window.statsUnsubscribe();
 
-            document.getElementById('solvedCount').innerText = solved;
-            document.getElementById('completedExams').innerText = exams;
+        window.statsUnsubscribe = onSnapshot(userRef, (docSnap) => {
+            if (docSnap.exists()) {
+                const data = docSnap.data();
+                const solved = data.solvedCount || 0;
+                const correct = data.correctCount || 0;
+                const exams = data.completedExams || 0;
 
-            const rate = solved > 0 ? Math.round((correct / solved) * 100) : 0;
-            document.getElementById('successRate').innerText = `%${rate}`;
+                const solvedCountEl = document.getElementById('solvedCount');
+                if (solvedCountEl) solvedCountEl.innerText = solved;
 
-            if (window.successChartInstance) {
-                window.successChartInstance.data.datasets[0].data = [rate, rate, rate, rate];
-                window.successChartInstance.update();
+                const completedExamsEl = document.getElementById('completedExams');
+                if (completedExamsEl) completedExamsEl.innerText = exams;
+
+                let rate = 0;
+                if (solved > 0) {
+                    rate = Math.round((correct / solved) * 100);
+                }
+                const successRateEl = document.getElementById('successRate');
+                if (successRateEl) successRateEl.innerText = `%${rate}`;
+
+                if (window.successChartInstance) {
+                    window.successChartInstance.data.datasets[0].data = [rate, rate, rate, rate];
+                    window.successChartInstance.update();
+                }
+            } else {
+                // Doküman henüz yoksa, dashboard 0 kalsın
+                if (document.getElementById('solvedCount')) document.getElementById('solvedCount').innerText = 0;
+                if (document.getElementById('completedExams')) document.getElementById('completedExams').innerText = 0;
+                if (document.getElementById('successRate')) document.getElementById('successRate').innerText = "%0";
             }
-        }
+        });
     } catch (err) {
         console.error("Fetch stats error", err);
     }
