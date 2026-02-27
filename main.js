@@ -10,6 +10,32 @@ let correctCount = 0;
 let wrongCount = 0;
 let currentKategori = null; // Mevcut kategoriyi hafızada tutmak için
 
+// MOCK EXAM STATE
+let isMockExam = false;
+let userAnswers = []; // [index] -> secilenHarf (örn: "A", "B")
+let examTimerInterval = null;
+let timeRemaining = 45 * 60;
+
+function startExamTimer() {
+    timeRemaining = 45 * 60;
+    const timerEl = document.getElementById('exam-timer');
+    if (timerEl) timerEl.style.display = 'inline-block';
+
+    clearInterval(examTimerInterval);
+    examTimerInterval = setInterval(() => {
+        timeRemaining--;
+        let m = Math.floor(timeRemaining / 60);
+        let s = timeRemaining % 60;
+        if (timerEl) timerEl.innerText = `⏱ ${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+
+        if (timeRemaining <= 0) {
+            clearInterval(examTimerInterval);
+            alert("Süre doldu! Sınavınız otomatik olarak bitiriliyor.");
+            window.finishExam();
+        }
+    }, 1000);
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     if (document.getElementById('quiz-screen')) {
         // URL'den kategori parametresini kontrol et
@@ -21,14 +47,27 @@ document.addEventListener('DOMContentLoaded', () => {
 
 import { collection, getDocs, query, where } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
+window.showPreExamScreen = function () {
+    document.getElementById('mode-selection').style.display = 'none';
+    document.getElementById('pre-exam-screen').style.display = 'block';
+};
+
 // Sınavı başlatırken opsiyonel kategori filtresi ile rastgele 10-50 soru seç
 window.startNewQuiz = async function (secilenKategori = null) {
     const modeSel = document.getElementById('mode-selection');
+    const preExamScr = document.getElementById('pre-exam-screen');
     const quizScr = document.getElementById('quiz-screen');
-    const loadingEl = document.getElementById('loading-spinner'); // Gösterge varsa ekleyebiliriz
 
     if (modeSel) modeSel.style.display = 'none';
-    if (quizScr) quizScr.style.display = 'none';
+    if (preExamScr) preExamScr.style.display = 'none';
+
+    // Mock Exam kontrolü
+    if (secilenKategori === 'mock') {
+        isMockExam = true;
+        secilenKategori = null; // Karışık olacak
+    } else {
+        isMockExam = false;
+    }
 
     // UI'da ufak bir yükleniyor durumu gösterebiliriz (basitçe testin içine yazarak)
     const questionTextEl = document.getElementById('question-text');
@@ -72,8 +111,17 @@ window.startNewQuiz = async function (secilenKategori = null) {
         score = 0;
         correctCount = 0;
         wrongCount = 0;
+        userAnswers = new Array(activeQuestions.length).fill(null);
 
         document.getElementById('question-counter').innerText = `Soru ${currentQuestionIndex + 1} / ${activeQuestions.length}`;
+
+        if (isMockExam) {
+            startExamTimer();
+        } else {
+            const timerEl = document.getElementById('exam-timer');
+            if (timerEl) timerEl.style.display = 'none';
+        }
+
         loadQuestion();
         // startTimer(); // Timer fonksiyonu yok, eklenmedi.
 
@@ -87,10 +135,16 @@ function loadQuestion() {
     const q = activeQuestions[currentQuestionIndex];
     if (!q) return;
 
-    document.getElementById('next-btn').style.display = 'none';
+    // Navigasyon tuşlarını güncelle
+    updateNavigationButtons();
 
     // Soru Başlığı ve İlerleyiş
-    document.getElementById('question-counter').innerText = `Soru ${currentQuestionIndex + 1} / ${activeQuestions.length}`;
+    if (!isMockExam) {
+        document.getElementById('question-counter').innerText = `Soru ${currentQuestionIndex + 1} / ${activeQuestions.length}`;
+    } else {
+        document.getElementById('question-counter').innerText = `Soru ${currentQuestionIndex + 1} / ${activeQuestions.length}`;
+        document.getElementById('score-display').style.display = 'none'; // Skor gerçek zamanlı gösterilmez
+    }
 
     // Soru Metni ve Resmi 
     let textHTML = `<h3>${q.soru}</h3>`;
@@ -121,6 +175,13 @@ function loadQuestion() {
             button.style.padding = '10px';
         }
 
+        // Eğer daha önce seçilmişse vurgula
+        const btnHarfHTML = btnHTML.match(/([A-D])\)/);
+        const thisBtnHarf = btnHarfHTML ? btnHarfHTML[1] : secenek.split(')')[0].trim();
+        if (isMockExam && userAnswers[currentQuestionIndex] === thisBtnHarf) {
+            button.classList.add('selected-option');
+        }
+
         button.innerHTML = btnHTML;
         button.onclick = () => checkAnswer(button, secenek, q.cevap);
         optionsContainer.appendChild(button);
@@ -144,16 +205,24 @@ function checkAnswer(clickedButton, secilenMetin, dogruCevapHarfi) {
     const optionsContainer = document.getElementById('options-container');
     const allButtons = Array.from(optionsContainer.children);
 
-    // Düğmeleri etkisizleştir
-    allButtons.forEach(btn => btn.disabled = true);
-
     // Tıklanan metinden kullanıcının seçtiği harfi ayıkla (Örn: "A) HTTP..." -> "A")
     const secilenHarf = secilenMetin.split(')')[0].trim();
+
+    if (isMockExam) {
+        // Mock sınavında anında doğru/yanlış gösterme, sadece seçimi kaydet
+        userAnswers[currentQuestionIndex] = secilenHarf;
+
+        allButtons.forEach(btn => btn.classList.remove('selected-option'));
+        clickedButton.classList.add('selected-option');
+        return; // Burada bitir
+    }
+
+    // Practice Modu İse (Gerçek Zamanlı Dönüt)
+    allButtons.forEach(btn => btn.disabled = true);
     const isCorrect = (secilenHarf === dogruCevapHarfi);
 
     // Renklendirme Ataması
     allButtons.forEach(btn => {
-        // Bu butonun temsil ettiği şıkkı bulalım (Örn: A, B, C, D)
         const btnHarfHTML = btn.innerHTML.match(/([A-D])\)/);
         const thisBtnHarf = btnHarfHTML ? btnHarfHTML[1] : btn.innerText.split(')')[0].trim();
 
@@ -174,6 +243,32 @@ function checkAnswer(clickedButton, secilenMetin, dogruCevapHarfi) {
     document.getElementById('next-btn').style.display = 'block';
 }
 
+function updateNavigationButtons() {
+    const navDiv = document.getElementById('exam-navigation');
+    const prevBtn = document.getElementById('prev-btn');
+    const nextBtn = document.getElementById('next-btn');
+    const finishBtn = document.getElementById('finish-btn');
+
+    if (isMockExam) {
+        navDiv.style.display = 'flex';
+        prevBtn.style.display = currentQuestionIndex > 0 ? 'block' : 'none';
+
+        if (currentQuestionIndex === activeQuestions.length - 1) {
+            nextBtn.style.display = 'none';
+            finishBtn.style.display = 'block';
+        } else {
+            nextBtn.style.display = 'block';
+            finishBtn.style.display = 'none';
+        }
+    } else {
+        // Practice mode
+        navDiv.style.display = 'flex';
+        prevBtn.style.display = 'none';
+        finishBtn.style.display = 'none';
+        nextBtn.style.display = 'none'; // Sadece cevaplanınca gösterilecek checkAnswer'da
+    }
+}
+
 window.nextQuestion = function () {
     // Misafir Kısıtlaması (15 soruyu tamamlayıp 16. soruya geçerken durdurur: index == 14)
     if (window.currentUserRole === 'guest' && currentQuestionIndex === 14) {
@@ -185,23 +280,152 @@ window.nextQuestion = function () {
     currentQuestionIndex++;
     if (currentQuestionIndex < activeQuestions.length) {
         loadQuestion();
-    } else {
-        showResults();
+    } else if (!isMockExam) {
+        window.finishExam();
     }
 }
 
-function showResults() {
+window.prevQuestion = function () {
+    if (currentQuestionIndex > 0) {
+        currentQuestionIndex--;
+        loadQuestion();
+    }
+}
+
+window.finishExam = function () {
+    clearInterval(examTimerInterval);
     document.getElementById('quiz-screen').style.display = 'none';
     document.getElementById('result-screen').style.display = 'block';
-    document.getElementById('progress-fill').style.width = '100%';
-    const totalAnswered = currentQuestionIndex + 1; // Limit takıldıysa toplam çözülen
-    const maxScore = totalAnswered * 10;
-    document.getElementById('final-score').innerText = `Toplam Puanınız: ${score} / ${maxScore}`;
 
-    // Profil verilerini Firestore'a kaydet
-    if (window.currentUserRole === 'user' && typeof window.saveExamResult === 'function') {
-        window.saveExamResult(correctCount, totalAnswered);
+    // Skor Hesaplama (Mock Exam için)
+    if (isMockExam) {
+        correctCount = 0;
+        wrongCount = 0;
+        let blankCount = 0;
+        score = 0;
+
+        for (let i = 0; i < activeQuestions.length; i++) {
+            const dogruCevap = activeQuestions[i].cevap;
+            const kullaniciCevabi = userAnswers[i];
+
+            if (!kullaniciCevabi) {
+                blankCount++;
+            } else if (kullaniciCevabi === dogruCevap) {
+                correctCount++;
+                score += (100 / activeQuestions.length); // Dinamik puan
+            } else {
+                wrongCount++;
+            }
+        }
+
+        document.getElementById('res-correct').innerText = correctCount;
+        document.getElementById('res-wrong').innerText = wrongCount;
+        document.getElementById('res-blank').innerText = blankCount;
+        document.getElementById('res-score').innerText = Math.round(score);
+
+        const statusEl = document.getElementById('res-status');
+        if (score >= 70) {
+            statusEl.innerText = "Tebrikler, Geçtiniz! 🎉";
+            statusEl.style.backgroundColor = "#dcfce3";
+            statusEl.style.color = "#16a34a";
+        } else {
+            statusEl.innerText = "Maalesef Kaldınız! 😔";
+            statusEl.style.backgroundColor = "#fee2e2";
+            statusEl.style.color = "#dc2626";
+        }
+
+    } else {
+        // Eski tarz results
+        const totalAnswered = currentQuestionIndex;
+        document.getElementById('res-correct').innerText = correctCount;
+        document.getElementById('res-wrong').innerText = wrongCount;
+        document.getElementById('res-blank').innerText = 0;
+        document.getElementById('res-score').innerText = score;
+
+        const statusEl = document.getElementById('res-status');
+        statusEl.innerText = "Pratik Testi Tamamlandı!";
+        statusEl.style.backgroundColor = "#f1f5f9";
+        statusEl.style.color = "#64748b";
     }
+
+    // Profil istatistiğini kaydetmeye çalış (auth.js içindeki window.saveExamResult)
+    if (window.saveExamResult && typeof window.saveExamResult === 'function') {
+        window.saveExamResult(correctCount, activeQuestions.length);
+    }
+}
+
+window.reviewMistakes = function () {
+    document.getElementById('result-screen').style.display = 'none';
+    document.getElementById('review-screen').style.display = 'block';
+
+    const container = document.getElementById('review-container');
+    container.innerHTML = '';
+
+    let hasMistakes = false;
+
+    for (let i = 0; i < activeQuestions.length; i++) {
+        const q = activeQuestions[i];
+        const userAnswer = userAnswers[i];
+
+        if (userAnswer && userAnswer !== q.cevap) {
+            hasMistakes = true;
+
+            const div = document.createElement('div');
+            div.style.background = 'white';
+            div.style.padding = '20px';
+            div.style.borderRadius = '12px';
+            div.style.marginBottom = '20px';
+            div.style.borderLeft = '4px solid #ef4444';
+            div.style.boxShadow = 'var(--shadow-sm)';
+
+            let optionsHtml = '';
+            q.secenekler.forEach(opt => {
+                const optHarfMatch = opt.match(/([A-D])\)/);
+                const optHarf = optHarfMatch ? optHarfMatch[1] : opt.split(')')[0].trim();
+
+                let colorAttr = 'color: #64748b;';
+                let bgAttr = '';
+
+                if (optHarf === q.cevap) { // Doğru olan yeşil
+                    colorAttr = 'color: #16a34a; font-weight: bold;';
+                    bgAttr = 'background: #dcfce3; padding: 5px; border-radius: 4px;';
+                } else if (optHarf === userAnswer) { // Kullanıcının seçtiği yanlış kırmızı
+                    colorAttr = 'color: #dc2626; text-decoration: line-through;';
+                    bgAttr = 'background: #fee2e2; padding: 5px; border-radius: 4px;';
+                }
+
+                // Resim formatını kontrol et
+                const parts = opt.split(") ");
+                if (parts.length === 2 && parts[1].startsWith('http')) {
+                    optionsHtml += `<div style="margin-bottom: 8px; ${bgAttr}"><span style="${colorAttr}">${parts[0]}) </span><img src="${parts[1]}" style="max-height: 40px; vertical-align: middle;"></div>`;
+                } else {
+                    optionsHtml += `<div style="margin-bottom: 8px; ${bgAttr}"><span style="${colorAttr}">${opt}</span></div>`;
+                }
+            });
+
+            let imgHtml = '';
+            if (q.imageUrl) {
+                imgHtml = `<div style="margin-bottom: 10px;"><img src="${q.imageUrl}" style="max-height: 150px; border-radius: 6px;"></div>`;
+            }
+
+            div.innerHTML = `
+                <div style="font-size: 13px; color: #64748b; margin-bottom: 8px;">Soru ${i + 1}</div>
+                <h4 style="color: var(--navy); margin-bottom: 15px;">${q.soru}</h4>
+                ${imgHtml}
+                <div style="margin-top: 15px;">${optionsHtml}</div>
+            `;
+            container.appendChild(div);
+        }
+    }
+
+    if (!hasMistakes) {
+        container.innerHTML = '<div style="text-align: center; color: #64748b; padding: 30px;">Hiç yanlışınız yok veya işaretleme yapmadınız! Harika!</div>';
+    }
+}
+
+window.showResultScreen = function () {
+    document.getElementById('review-screen').style.display = 'none';
+    document.getElementById('result-screen').style.display = 'block';
 }
 
 window.restartQuiz = function () {

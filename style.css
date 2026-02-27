@@ -1144,3 +1144,11 @@ body {
         margin-bottom: 30px;
     }
 }
+
+/* Mock Exam Selected Option */
+.selected-option {
+    border-color: var(--orange) !important;
+    background-color: #fffaf0 !important;
+    color: var(--orange) !important;
+    box-shadow: 0 0 0 2px var(--orange) inset !important;
+}
