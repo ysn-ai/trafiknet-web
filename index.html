@@ -221,14 +221,25 @@
                 <h3 id="welcomeUserText" class="profile-name">Merhaba, Öğrenci 👋</h3>
                 <p class="profile-status">TrafikNet Öğrencisi</p>
                 <div class="profile-actions">
-                    <button class="btn-outline-small" onclick="alert('Hesap ayarları yakında eklenecek!')"
+                    <button class="btn-outline-small" onclick="openProfileSettingsModal()"
                         style="width:100%; margin-bottom: 10px;">⚙️ Hesap Ayarları</button>
                     <button id="adminPanelBtn" class="btn-main btn-small"
                         onclick="window.location.href='yonetim-merkezi.html'"
                         style="width:100%; margin-bottom: 10px; display: none; background: #1a2b48; color: white;">👑
                         Yönetim Paneli</button>
-                    <button class="btn-orange btn-small" onclick="handleLogout()" style="width:100%;">🚪 Çıkış
+                    <button class="btn-orange btn-small" onclick="handleLogout()"
+                        style="width:100%; margin-bottom: 15px;">🚪 Çıkış
                         Yap</button>
+
+                    <!-- Dark Mode Toggle -->
+                    <div
+                        style="display: flex; align-items: center; justify-content: space-between; padding: 10px; background: var(--bg); border-radius: 8px; border: 1px solid var(--border);">
+                        <span style="font-size: 14px; font-weight: 600; color: var(--navy);">🌙 Karanlık Mod</span>
+                        <label class="switch">
+                            <input type="checkbox" id="darkModeToggle" onchange="toggleDarkMode()">
+                            <span class="slider round"></span>
+                        </label>
+                    </div>
                 </div>
             </div>
 
@@ -268,6 +279,75 @@
                             <h3 id="completedExams">0</h3>
                             <p>Bitirilen Deneme</p>
                         </div>
+                    </div>
+                </div>
+                <!-- Konu Bazlı Mükemmellik (Progress Bars) -->
+                <div class="category-stats-container"
+                    style="background: white; border-radius: 12px; padding: 25px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); margin-top: 30px; border: 1px solid var(--border);">
+                    <h3 style="margin-top: 0; color: var(--navy); font-size: 18px; margin-bottom: 20px;">Konu Bazlı
+                        Başarı</h3>
+                    <div style="display: flex; flex-direction: column; gap: 15px;">
+
+                        <!-- Trafik -->
+                        <div>
+                            <div
+                                style="display: flex; justify-content: space-between; font-size: 14px; font-weight: 600; margin-bottom: 5px;">
+                                <span>Trafik ve Çevre Bilgisi</span>
+                                <span id="perc-trafik">%0</span>
+                            </div>
+                            <div
+                                style="background-color: var(--bg); border-radius: 8px; height: 10px; overflow: hidden;">
+                                <div id="bar-trafik"
+                                    style="background-color: var(--orange); height: 100%; width: 0%; transition: width 1s ease;">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Araç Tekniği (Motor) -->
+                        <div>
+                            <div
+                                style="display: flex; justify-content: space-between; font-size: 14px; font-weight: 600; margin-bottom: 5px;">
+                                <span>Araç Tekniği (Motor)</span>
+                                <span id="perc-motor">%0</span>
+                            </div>
+                            <div
+                                style="background-color: var(--bg); border-radius: 8px; height: 10px; overflow: hidden;">
+                                <div id="bar-motor"
+                                    style="background-color: var(--navy-light); height: 100%; width: 0%; transition: width 1s ease;">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- İlk Yardım -->
+                        <div>
+                            <div
+                                style="display: flex; justify-content: space-between; font-size: 14px; font-weight: 600; margin-bottom: 5px;">
+                                <span>İlk Yardım Bilgisi</span>
+                                <span id="perc-ilkyardim">%0</span>
+                            </div>
+                            <div
+                                style="background-color: var(--bg); border-radius: 8px; height: 10px; overflow: hidden;">
+                                <div id="bar-ilkyardim"
+                                    style="background-color: #ef4444; height: 100%; width: 0%; transition: width 1s ease;">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Trafik Adabı -->
+                        <div>
+                            <div
+                                style="display: flex; justify-content: space-between; font-size: 14px; font-weight: 600; margin-bottom: 5px;">
+                                <span>Trafik Adabı</span>
+                                <span id="perc-adap">%0</span>
+                            </div>
+                            <div
+                                style="background-color: var(--bg); border-radius: 8px; height: 10px; overflow: hidden;">
+                                <div id="bar-adap"
+                                    style="background-color: #10b981; height: 100%; width: 0%; transition: width 1s ease;">
+                                </div>
+                            </div>
+                        </div>
+
                     </div>
                 </div>
 

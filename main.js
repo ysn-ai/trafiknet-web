@@ -1,7 +1,18 @@
 /* --- TRAFİKNET AKILLI SINAV MOTORU (FULL VERSİYON) --- */
+
+// --- TEMA ÖN YÜKLEME ---
+const savedTheme = localStorage.getItem('theme');
+if (savedTheme === 'dark') {
+    document.documentElement.classList.add('dark-theme');
+}
+
 window.currentUserRole = 'guest';
 
-
+// --- KARANLIK MOD (DARK MODE) MANTIĞI ---
+window.toggleDarkMode = function () {
+    const isDark = document.documentElement.classList.toggle('dark-theme');
+    localStorage.setItem('theme', isDark ? 'dark' : 'light');
+}
 
 let activeQuestions = [];
 let currentQuestionIndex = 0;
@@ -304,15 +315,34 @@ window.finishExam = function () {
     let blankCount = 0;
     score = 0;
 
+    // Gelişmiş İstatistikler (Konu Bazlı)
+    let categoryStats = {
+        'Trafik ve Çevre Bilgisi': { correct: 0, total: 0 },
+        'İlk Yardım Bilgisi': { correct: 0, total: 0 },
+        'Araç Tekniği (Motor)': { correct: 0, total: 0 },
+        'Trafik Adabı': { correct: 0, total: 0 }
+    };
+
     for (let i = 0; i < activeQuestions.length; i++) {
-        const dogruCevap = activeQuestions[i].cevap;
+        const q = activeQuestions[i];
+        const dogruCevap = q.cevap;
         const kullaniciCevabi = userAnswers[i];
+        const cat = q.kategori;
+
+        // Kategori istatistiği hazırla
+        if (categoryStats[cat]) {
+            categoryStats[cat].total++;
+        }
 
         if (!kullaniciCevabi) {
             blankCount++;
         } else if (kullaniciCevabi === dogruCevap) {
             correctCount++;
             score += (100 / activeQuestions.length); // Dinamik puan
+
+            if (categoryStats[cat]) {
+                categoryStats[cat].correct++;
+            }
         } else {
             wrongCount++;
         }
@@ -341,8 +371,13 @@ window.finishExam = function () {
     }
 
     // Profil istatistiğini kaydetmeye çalış (auth.js içindeki window.saveExamResult)
+    // Eğer deneme sınavıysa konu detaylarını da gönder
     if (window.saveExamResult && typeof window.saveExamResult === 'function') {
-        window.saveExamResult(correctCount, activeQuestions.length);
+        if (isMockExam) {
+            window.saveExamResult(correctCount, activeQuestions.length, categoryStats);
+        } else {
+            window.saveExamResult(correctCount, activeQuestions.length, null);
+        }
     }
 }
 

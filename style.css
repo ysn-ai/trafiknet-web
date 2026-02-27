@@ -17,6 +17,107 @@
     --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
+/* --- KARANLIK MOD (DARK THEME) DEĞİŞKENLERİ --- */
+:root.dark-theme {
+    --bg: #0f172a;
+    --navy: #f8fafc;
+    --navy-light: #cbd5e1;
+    --white: #1e293b;
+    --text: #f1f5f9;
+    --text-light: #94a3b8;
+    --border: #334155;
+    --glass-bg: rgba(30, 41, 59, 0.85);
+    background-color: var(--bg);
+}
+
+/* Dark Mode Modal & Specific Overrides */
+:root.dark-theme body {
+    background-color: var(--bg);
+}
+
+:root.dark-theme .navbar {
+    background: var(--glass-bg);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+:root.dark-theme .hero,
+:root.dark-theme .hero::after {
+    background: transparent;
+}
+
+:root.dark-theme .pricing-card,
+:root.dark-theme .feature-card,
+:root.dark-theme .step-card,
+:root.dark-theme .lesson-card,
+:root.dark-theme .accordion-item,
+:root.dark-theme .profile-sidebar,
+:root.dark-theme .profile-stat-card,
+:root.dark-theme .profile-chart-container,
+:root.dark-theme .modal-content {
+    background: var(--white);
+    border-color: var(--border);
+    color: var(--text);
+}
+
+:root.dark-theme input,
+:root.dark-theme select {
+    background: #0f172a;
+    color: var(--text);
+    border-color: var(--border);
+}
+
+/* Switch UI for Dark Mode Toggle */
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 44px;
+    height: 24px;
+}
+
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #cbd5e1;
+    transition: .4s;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 18px;
+    width: 18px;
+    left: 3px;
+    bottom: 3px;
+    background-color: white;
+    transition: .4s;
+}
+
+input:checked+.slider {
+    background-color: var(--orange);
+}
+
+input:checked+.slider:before {
+    transform: translateX(20px);
+}
+
+.slider.round {
+    border-radius: 24px;
+}
+
+.slider.round:before {
+    border-radius: 50%;
+}
+
 * {
     margin: 0;
     padding: 0;

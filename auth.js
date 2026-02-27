@@ -111,10 +111,21 @@ onAuthStateChanged(window.auth, (user) => {
 
         // Profil sayfasındaki isim güncellemesi
         const welcomeText = document.getElementById('welcomeUserText');
+        const avatarEl = document.querySelector('.profile-avatar');
+
         if (welcomeText) {
             const displayName = user.displayName || user.email.split('@')[0];
             welcomeText.textContent = `Merhaba, ${displayName} 👋`;
         }
+
+        // Firestore'dan özel avatar çek
+        getDoc(doc(window.db, "users", user.uid)).then(docSnap => {
+            if (docSnap.exists() && docSnap.data().avatar) {
+                if (avatarEl) avatarEl.textContent = docSnap.data().avatar;
+            } else {
+                if (avatarEl) avatarEl.textContent = '👤';
+            }
+        });
 
         // Admin Panel Butonu Yetki Kontrolü
         const adminBtn = document.getElementById('adminPanelBtn');
@@ -220,25 +231,49 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // --- FIRESTORE İSTATİSTİK FONKSİYONLARI ---
 
-window.saveExamResult = async function (correctInc, totalInExam) {
+window.saveExamResult = async function (correctInc, totalInExam, categoryStats = null) {
     if (!window.auth.currentUser) return;
     const uid = window.auth.currentUser.uid;
     const userRef = doc(window.db, "users", uid);
 
     try {
+        let updateData = {
+            solvedCount: increment(totalInExam),
+            correctCount: increment(correctInc),
+            completedExams: increment(1)
+        };
+
+        // Eğer kategori datası geldiyse ekle
+        if (categoryStats) {
+            updateData['trafik_correct'] = increment(categoryStats['Trafik ve Çevre Bilgisi'].correct);
+            updateData['trafik_total'] = increment(categoryStats['Trafik ve Çevre Bilgisi'].total);
+            updateData['motor_correct'] = increment(categoryStats['Araç Tekniği (Motor)'].correct);
+            updateData['motor_total'] = increment(categoryStats['Araç Tekniği (Motor)'].total);
+            updateData['ilkyardim_correct'] = increment(categoryStats['İlk Yardım Bilgisi'].correct);
+            updateData['ilkyardim_total'] = increment(categoryStats['İlk Yardım Bilgisi'].total);
+            updateData['adap_correct'] = increment(categoryStats['Trafik Adabı'].correct);
+            updateData['adap_total'] = increment(categoryStats['Trafik Adabı'].total);
+        }
+
         const docSnap = await getDoc(userRef);
         if (!docSnap.exists()) {
-            await setDoc(userRef, {
+            // İlk kez döküman yaratılırsa increment yerine asıl datayı yolla
+            let initialData = {
                 solvedCount: totalInExam,
                 correctCount: correctInc,
-                completedExams: 1
-            });
+                completedExams: 1,
+                trafik_correct: categoryStats ? categoryStats['Trafik ve Çevre Bilgisi'].correct : 0,
+                trafik_total: categoryStats ? categoryStats['Trafik ve Çevre Bilgisi'].total : 0,
+                motor_correct: categoryStats ? categoryStats['Araç Tekniği (Motor)'].correct : 0,
+                motor_total: categoryStats ? categoryStats['Araç Tekniği (Motor)'].total : 0,
+                ilkyardim_correct: categoryStats ? categoryStats['İlk Yardım Bilgisi'].correct : 0,
+                ilkyardim_total: categoryStats ? categoryStats['İlk Yardım Bilgisi'].total : 0,
+                adap_correct: categoryStats ? categoryStats['Trafik Adabı'].correct : 0,
+                adap_total: categoryStats ? categoryStats['Trafik Adabı'].total : 0
+            };
+            await setDoc(userRef, initialData);
         } else {
-            await updateDoc(userRef, {
-                solvedCount: increment(totalInExam),
-                correctCount: increment(correctInc),
-                completedExams: increment(1)
-            });
+            await updateDoc(userRef, updateData);
         }
     } catch (err) {
         console.error("Exam save error", err);
@@ -275,8 +310,32 @@ window.fetchProfileStats = function () {
                 const successRateEl = document.getElementById('successRate');
                 if (successRateEl) successRateEl.innerText = `%${rate}`;
 
+                // --- Gelişmiş İstatistik Barları (Progress Bar UI) İçin Data Çek ---
+                function getPerc(c, t) { return t > 0 ? Math.round((c / t) * 100) : 0; }
+                const trafikP = getPerc(data.trafik_correct || 0, data.trafik_total || 0);
+                const motorP = getPerc(data.motor_correct || 0, data.motor_total || 0);
+                const ilkP = getPerc(data.ilkyardim_correct || 0, data.ilkyardim_total || 0);
+                const adapP = getPerc(data.adap_correct || 0, data.adap_total || 0);
+
+                if (document.getElementById('bar-trafik')) {
+                    document.getElementById('bar-trafik').style.width = `${trafikP}%`;
+                    document.getElementById('perc-trafik').innerText = `%${trafikP}`;
+                }
+                if (document.getElementById('bar-motor')) {
+                    document.getElementById('bar-motor').style.width = `${motorP}%`;
+                    document.getElementById('perc-motor').innerText = `%${motorP}`;
+                }
+                if (document.getElementById('bar-ilkyardim')) {
+                    document.getElementById('bar-ilkyardim').style.width = `${ilkP}%`;
+                    document.getElementById('perc-ilkyardim').innerText = `%${ilkP}`;
+                }
+                if (document.getElementById('bar-adap')) {
+                    document.getElementById('bar-adap').style.width = `${adapP}%`;
+                    document.getElementById('perc-adap').innerText = `%${adapP}`;
+                }
+
                 if (window.successChartInstance) {
-                    window.successChartInstance.data.datasets[0].data = [rate, rate, rate, rate];
+                    window.successChartInstance.data.datasets[0].data = [trafikP, ilkP, motorP, adapP];
                     window.successChartInstance.update();
                 }
             } else {
@@ -284,9 +343,125 @@ window.fetchProfileStats = function () {
                 if (document.getElementById('solvedCount')) document.getElementById('solvedCount').innerText = 0;
                 if (document.getElementById('completedExams')) document.getElementById('completedExams').innerText = 0;
                 if (document.getElementById('successRate')) document.getElementById('successRate').innerText = "%0";
+
+                // Barları da Sıfırla
+                ['trafik', 'motor', 'ilkyardim', 'adap'].forEach(t => {
+                    if (document.getElementById(`bar-${t}`)) document.getElementById(`bar-${t}`).style.width = '0%';
+                    if (document.getElementById(`perc-${t}`)) document.getElementById(`perc-${t}`).innerText = '%0';
+                });
             }
         });
     } catch (err) {
         console.error("Fetch stats error", err);
     }
 };
+
+// ==== PROFİL AYARLARI MODAL İŞLEMLERİ ====
+import { updatePassword } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+
+window.openProfileSettingsModal = function () {
+    const modal = document.getElementById('profileSettingsModal');
+    if (modal) {
+        const nameInput = document.getElementById('updateNameInput');
+        if (window.auth && window.auth.currentUser) {
+            nameInput.value = window.auth.currentUser.displayName || '';
+        }
+
+        // Firestore'dan mevcut avatarı seç
+        const uid = window.auth.currentUser.uid;
+        getDoc(doc(window.db, "users", uid)).then(docSnap => {
+            let curAvatar = '👤';
+            if (docSnap.exists() && docSnap.data().avatar) curAvatar = docSnap.data().avatar;
+
+            document.getElementById('selectedAvatarInput').value = curAvatar;
+            const allOptions = document.querySelectorAll('.avatar-option');
+            allOptions.forEach(opt => {
+                opt.classList.remove('selected');
+                opt.style.borderColor = 'transparent';
+                if (opt.textContent.trim() === curAvatar) {
+                    opt.classList.add('selected');
+                    opt.style.borderColor = 'var(--orange)';
+                }
+            });
+        });
+
+        modal.style.display = 'block';
+        document.body.style.overflow = 'hidden';
+    }
+}
+
+window.closeProfileSettingsModal = function () {
+    const modal = document.getElementById('profileSettingsModal');
+    if (modal) {
+        modal.style.display = 'none';
+        document.body.style.overflow = 'auto';
+        document.getElementById('updatePasswordInput').value = '';
+        document.getElementById('settingsMessage').style.display = 'none';
+    }
+}
+
+window.selectAvatar = function (element, avatarEmoji) {
+    const allOptions = document.querySelectorAll('.avatar-option');
+    allOptions.forEach(opt => {
+        opt.classList.remove('selected');
+        opt.style.borderColor = 'transparent';
+    });
+
+    element.classList.add('selected');
+    element.style.borderColor = 'var(--orange)';
+    document.getElementById('selectedAvatarInput').value = avatarEmoji;
+}
+
+window.saveProfileSettings = async function () {
+    const user = window.auth.currentUser;
+    if (!user) return;
+
+    const newName = document.getElementById('updateNameInput').value.trim();
+    const newPassword = document.getElementById('updatePasswordInput').value.trim();
+    const newAvatar = document.getElementById('selectedAvatarInput').value;
+    const msgEl = document.getElementById('settingsMessage');
+
+    msgEl.style.display = 'block';
+    msgEl.style.color = 'var(--navy)';
+    msgEl.innerText = "Güncelleniyor...";
+
+    try {
+        // İsim Güncelleme
+        if (newName && newName !== user.displayName) {
+            await updateProfile(user, { displayName: newName });
+            document.getElementById('welcomeUserText').textContent = `Merhaba, ${newName} 👋`;
+        }
+
+        // Firestore Avatar Güncelleme
+        const userRef = doc(window.db, "users", user.uid);
+        await setDoc(userRef, { avatar: newAvatar }, { merge: true });
+
+        const avatarEl = document.querySelector('.profile-avatar');
+        if (avatarEl) avatarEl.textContent = newAvatar;
+
+        // Şifre Güncelleme (Geçerli oturum yeniyse çalışır)
+        if (newPassword) {
+            if (newPassword.length < 6) {
+                msgEl.style.color = 'red';
+                msgEl.innerText = "Şifre en az 6 karakter olmalıdır.";
+                return;
+            }
+            await updatePassword(user, newPassword);
+        }
+
+        msgEl.style.color = 'green';
+        msgEl.innerText = "Profil başarıyla güncellendi!";
+
+        setTimeout(() => {
+            closeProfileSettingsModal();
+        }, 1500);
+
+    } catch (err) {
+        msgEl.style.color = 'red';
+        if (err.code === 'auth/requires-recent-login') {
+            msgEl.innerText = "Güvenlik nedeniyle şifre değiştirmek için çıkış yapıp tekrar giriş yapmalısınız.";
+        } else {
+            msgEl.innerText = "Bir hata oluştu: " + err.message;
+        }
+    }
+}
