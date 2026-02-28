@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Dinamik başlık ve açıklama JS tarafından güncellenir -->
+    <title>Trafik Rehberi | TrafikNet</title>
+    <meta name="description" content="TrafikNet Trafik Rehberi - Sürücülere yönelik kapsamlı bilgilendirme.">
+    <meta name="keywords" content="trafik rehberi, ehliyet 2026, trafik cezası, mevzuat, sürücü bilgilendirme">
+    <meta name="google-site-verification" content="NAfYzQgDhrse-8QOBdpSDJVVoQLGKWo62izBh8ZKY2s" />
+    <!-- Google AdSense -->
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6350460649779661"
+        crossorigin="anonymous"></script>
+    <link rel="icon" type="image/png" href="app_icon.png?v=1">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+
+    <!-- JSON-LD: Article Schema (dinamik olarak JS güncelleyecek) -->
+    <script type="application/ld+json" id="articleSchema">
+    {
+        "@context": "https://schema.org",
+        "@type": "Article",
+        "headline": "TrafikNet Trafik Rehberi",
+        "publisher": {
+            "@type": "Organization",
+            "name": "TrafikNet",
+            "url": "https://trafiknet.site",
+            "logo": {
+                "@type": "ImageObject",
+                "url": "https://trafiknet.site/app_icon.png"
+            }
+        }
+    }
+    </script>
+
+    <style>
+        body {
+            background-color: #f1f5f9;
+        }
+
+        /* Makale Konteyneri */
+        .article-wrapper {
+            max-width: 760px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .article-header {
+            background: white;
+            border-radius: 14px;
+            padding: 40px;
+            margin-bottom: 24px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            border: 1px solid #e2e8f0;
+        }
+
+        .article-meta-top {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 18px;
+            flex-wrap: wrap;
+        }
+
+        .kategori-badge {
+            font-size: 12px;
+            font-weight: 700;
+            padding: 5px 12px;
+            border-radius: 20px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .badge-mevzuat {
+            background: #dbeafe;
+            color: #1d4ed8;
+        }
+
+        .badge-duyuru {
+            background: #dcfce7;
+            color: #15803d;
+        }
+
+        .badge-teknik {
+            background: #fef9c3;
+            color: #854d0e;
+        }
+
+        .article-date {
+            font-size: 13px;
+            color: #94a3b8;
+            font-weight: 600;
+        }
+
+        .article-header h1 {
+            font-size: clamp(22px, 4vw, 32px);
+            font-weight: 800;
+            color: var(--navy);
+            line-height: 1.35;
+            margin-bottom: 16px;
+        }
+
+        .article-lead {
+            font-size: 17px;
+            color: #475569;
+            line-height: 1.8;
+            border-left: 4px solid var(--orange);
+            padding-left: 18px;
+            margin: 0;
+        }
+
+        .article-banner {
+            width: 100%;
+            border-radius: 14px;
+            margin-bottom: 24px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            display: block;
+        }
+
+        /* Makale Gövdesi */
+        .article-body {
+            background: white;
+            border-radius: 14px;
+            padding: 40px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            border: 1px solid #e2e8f0;
+            margin-bottom: 24px;
+        }
+
+        .article-content h2 {
+            font-size: 22px;
+            font-weight: 800;
+            color: var(--navy);
+            margin-top: 36px;
+            margin-bottom: 14px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #f1f5f9;
+        }
+
+        .article-content h3 {
+            font-size: 18px;
+            font-weight: 700;
+            color: #1e3a5f;
+            margin-top: 24px;
+            margin-bottom: 10px;
+        }
+
+        .article-content p {
+            font-size: 16px;
+            color: #374151;
+            line-height: 1.9;
+            margin-bottom: 16px;
+        }
+
+        .article-content ul,
+        .article-content ol {
+            margin: 0 0 16px 24px;
+        }
+
+        .article-content li {
+            font-size: 15px;
+            color: #374151;
+            line-height: 1.8;
+            margin-bottom: 8px;
+        }
+
+        .article-content strong {
+            color: var(--navy);
+        }
+
+        .info-box {
+            background: #eff6ff;
+            border-left: 4px solid #3b82f6;
+            border-radius: 0 8px 8px 0;
+            padding: 16px 20px;
+            margin: 20px 0;
+        }
+
+        .info-box.warning {
+            background: #fff7ed;
+            border-left-color: var(--orange);
+        }
+
+        .info-box.success {
+            background: #f0fdf4;
+            border-left-color: #22c55e;
+        }
+
+        .info-box p {
+            margin: 0;
+            font-size: 15px;
+        }
+
+        /* Tablo */
+        .article-content table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            font-size: 14px;
+        }
+
+        .article-content th {
+            background: var(--navy);
+            color: white;
+            padding: 12px 15px;
+            text-align: left;
+            font-weight: 700;
+        }
+
+        .article-content td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #e2e8f0;
+            color: #374151;
+        }
+
+        .article-content tr:nth-child(even) td {
+            background: #f8fafc;
+        }
+
+        /* Loading / Error */
+        .loading-wrapper {
+            text-align: center;
+            padding: 80px 20px;
+        }
+
+        .spinner-lg {
+            width: 48px;
+            height: 48px;
+            border: 5px solid #e2e8f0;
+            border-top-color: var(--orange);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* Diğer Yazılar */
+        .other-posts {
+            background: white;
+            border-radius: 14px;
+            padding: 30px 40px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            border: 1px solid #e2e8f0;
+            margin-bottom: 40px;
+        }
+
+        .other-posts h3 {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--navy);
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid #f1f5f9;
+        }
+
+        .other-post-link {
+            display: flex;
+            align-items: flex-start;
+            gap: 14px;
+            padding: 14px 0;
+            border-bottom: 1px solid #f1f5f9;
+            text-decoration: none;
+            transition: padding-left 0.2s;
+        }
+
+        .other-post-link:hover {
+            padding-left: 5px;
+        }
+
+        .other-post-link:last-child {
+            border-bottom: none;
+        }
+
+        .other-post-icon {
+            font-size: 24px;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+
+        .other-post-link h4 {
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--navy);
+            margin-bottom: 4px;
+        }
+
+        .other-post-link span {
+            font-size: 12px;
+            color: #94a3b8;
+        }
+
+        @media (max-width: 640px) {
+
+            .article-header,
+            .article-body,
+            .other-posts {
+                padding: 24px 20px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <nav class="navbar">
+        <div class="container nav-box">
+            <div class="logo-container" style="cursor: pointer;" onclick="window.location.href='index.html'">
+                <img src="app_icon.png" alt="TrafikNet Logo" class="logo-img">
+                <div class="logo-text">Trafik<span>Net</span></div>
+            </div>
+            <ul class="nav-links">
+                <li><button class="btn-outline-small" onclick="window.location.href='rehber.html'"
+                        style="display: flex; align-items: center; gap: 8px;">⬅ Rehbere Dön</button></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- İçerik Alanı -->
+    <div class="article-wrapper" style="padding-top: 40px; padding-bottom: 20px;">
+
+        <!-- Yükleniyor -->
+        <div id="loadingWrapper" class="loading-wrapper">
+            <div class="spinner-lg"></div>
+            <p style="color: #64748b; font-weight: 600; font-size: 16px;">İçerik yükleniyor...</p>
+        </div>
+
+        <!-- Hata -->
+        <div id="errorWrapper" style="display: none; text-align: center; padding: 80px 20px;">
+            <div style="font-size: 48px; margin-bottom: 16px;">😕</div>
+            <h2 style="color: var(--navy); margin-bottom: 10px;">İçerik Bulunamadı</h2>
+            <p style="color: #64748b; margin-bottom: 24px;">Aradığınız rehber yazısı mevcut değil veya kaldırılmış
+                olabilir.</p>
+            <a href="rehber.html" class="btn-orange"
+                style="padding: 12px 28px; border-radius: 8px; text-decoration: none; font-weight: 700;">⬅ Tüm Yazılara
+                Dön</a>
+        </div>
+
+        <!-- Makale (JS tarafından doldurulur) -->
+        <article id="articleContent" style="display: none;">
+
+            <!-- Header -->
+            <header class="article-header">
+                <div class="article-meta-top">
+                    <span class="kategori-badge" id="artKategoriBadge"></span>
+                    <span class="article-date" id="artDate"></span>
+                </div>
+                <h1 id="artBaslik"></h1>
+                <p class="article-lead" id="artKisaOz"></p>
+            </header>
+
+            <!-- Kapak Görseli (varsa) -->
+            <img id="artGorsel" class="article-banner" style="display:none;" alt="">
+
+            <!-- Gövde -->
+            <div class="article-body">
+                <div class="article-content" id="artTamMetin"></div>
+            </div>
+
+            <!-- Diğer Yazılar -->
+            <div class="other-posts">
+                <h3>📚 Diğer Bilgilendirmeler</h3>
+                <div id="otherPostsList">
+                    <p style="color: #94a3b8; font-size: 14px;">Yükleniyor...</p>
+                </div>
+                <div style="margin-top: 20px; text-align: center;">
+                    <a href="rehber.html" class="btn-oku"
+                        style="display: inline-flex; align-items: center; gap: 6px; background: var(--navy); color: white; padding: 10px 22px; border-radius: 8px; text-decoration: none; font-weight: 700; font-size: 14px;">
+                        Tüm Yazıları Gör →
+                    </a>
+                </div>
+            </div>
+
+        </article>
+    </div>
+
+    <footer style="background: var(--navy); color: white; text-align: center; padding: 30px 20px;">
+        <p style="opacity: 0.7; font-size: 14px;">© 2026 TrafikNet · Tüm hakları saklıdır.</p>
+    </footer>
+
+    <script type="module" src="rehber.js"></script>
+</body>
+
+</html>

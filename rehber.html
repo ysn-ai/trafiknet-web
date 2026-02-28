@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trafik Rehberi | Mevzuat, Duyuru ve Bilgilendirmeler | TrafikNet</title>
+    <meta name="description"
+        content="TrafikNet Bilgi Merkezi: 2026 trafik cezaları, ehliyet mevzuatı değişiklikleri, sürücü rehberi ve güncel trafik duyuruları. Ehliyet başvurusu, ceza puanı ve trafik kuralları hakkında kapsamlı bilgi.">
+    <meta name="keywords"
+        content="trafik rehberi, ehliyet 2026, trafik cezası 2026, trafik mevzuat, ehliyet başvurusu, ceza puanı, trafik kuralları, ehliyet sınavı 2026, sürücü rehberi">
+    <meta name="google-site-verification" content="NAfYzQgDhrse-8QOBdpSDJVVoQLGKWo62izBh8ZKY2s" />
+    <!-- Google AdSense -->
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6350460649779661"
+        crossorigin="anonymous"></script>
+    <link rel="icon" type="image/png" href="app_icon.png?v=1">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+
+    <!-- JSON-LD: ItemList Schema -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "ItemList",
+        "name": "TrafikNet Trafik Rehberi",
+        "description": "Trafik mevzuatı, ehliyet bilgilendirmeleri ve sürücü rehberi içerikleri",
+        "url": "https://trafiknet.site/rehber.html",
+        "publisher": {
+            "@type": "Organization",
+            "name": "TrafikNet",
+            "url": "https://trafiknet.site"
+        }
+    }
+    </script>
+
+    <style>
+        body {
+            background-color: #f1f5f9;
+        }
+
+        /* Hero Banner */
+        .rehber-hero {
+            background: linear-gradient(135deg, var(--navy) 0%, #1e3a5f 100%);
+            padding: 60px 0 50px;
+            text-align: center;
+            color: white;
+        }
+
+        .rehber-hero h1 {
+            font-size: clamp(26px, 5vw, 42px);
+            font-weight: 800;
+            margin-bottom: 12px;
+        }
+
+        .rehber-hero p {
+            font-size: 16px;
+            opacity: 0.8;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* Filter Tabs */
+        .filter-tabs {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin: 30px 0 10px;
+        }
+
+        .filter-btn {
+            padding: 8px 20px;
+            border: 2px solid #e2e8f0;
+            border-radius: 50px;
+            background: white;
+            color: #64748b;
+            font-family: inherit;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.25s;
+        }
+
+        .filter-btn:hover,
+        .filter-btn.active {
+            background: var(--orange);
+            color: white;
+            border-color: var(--orange);
+        }
+
+        /* Grid */
+        .rehber-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 24px;
+            margin-top: 30px;
+        }
+
+        /* Rehber Card */
+        .rehber-card {
+            background: white;
+            border-radius: 14px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.06);
+            transition: transform 0.25s, box-shadow 0.25s;
+            display: flex;
+            flex-direction: column;
+            border: 1px solid #e2e8f0;
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .rehber-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.12);
+        }
+
+        .rehber-card-banner {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+            display: block;
+        }
+
+        .rehber-card-banner-placeholder {
+            width: 100%;
+            height: 180px;
+            background: linear-gradient(135deg, #1a2b48 0%, #2d4a7a 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 48px;
+        }
+
+        .rehber-card-body {
+            padding: 22px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .rehber-card-meta {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+
+        .kategori-badge {
+            font-size: 11px;
+            font-weight: 700;
+            padding: 4px 10px;
+            border-radius: 20px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .badge-mevzuat {
+            background: #dbeafe;
+            color: #1d4ed8;
+        }
+
+        .badge-duyuru {
+            background: #dcfce7;
+            color: #15803d;
+        }
+
+        .badge-teknik {
+            background: #fef9c3;
+            color: #854d0e;
+        }
+
+        .rehber-card-date {
+            font-size: 12px;
+            color: #94a3b8;
+            font-weight: 600;
+        }
+
+        .rehber-card-body h2 {
+            font-size: 17px;
+            font-weight: 700;
+            color: var(--navy);
+            line-height: 1.45;
+            margin-bottom: 10px;
+        }
+
+        .rehber-card-body p {
+            font-size: 14px;
+            color: #64748b;
+            line-height: 1.65;
+            flex: 1;
+        }
+
+        .rehber-card-footer {
+            margin-top: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+        }
+
+        .btn-oku {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: var(--orange);
+            color: white;
+            padding: 8px 18px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 700;
+            text-decoration: none;
+            transition: background 0.2s;
+        }
+
+        .btn-oku:hover {
+            background: #e67310;
+        }
+
+        /* Empty / Loading state */
+        .loading-state,
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            grid-column: 1 / -1;
+        }
+
+        .loading-state .spinner-sm {
+            width: 36px;
+            height: 36px;
+            border: 4px solid #e2e8f0;
+            border-top-color: var(--orange);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin: 0 auto 15px;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .empty-state-icon {
+            font-size: 48px;
+            margin-bottom: 15px;
+        }
+
+        @media (max-width: 640px) {
+            .rehber-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <nav class="navbar">
+        <div class="container nav-box">
+            <div class="logo-container" style="cursor: pointer;" onclick="window.location.href='index.html'">
+                <img src="app_icon.png" alt="TrafikNet Logo" class="logo-img">
+                <div class="logo-text">Trafik<span>Net</span></div>
+            </div>
+            <ul class="nav-links">
+                <li><a href="dersler.html">Ders Notları</a></li>
+                <li><a href="sinav.html?kategori=mock">Deneme Sınavları</a></li>
+                <li><a href="rehber.html" style="color: var(--orange); font-weight: 700;">📰 Bilgi Merkezi</a></li>
+                <li><a href="index.html" class="btn-orange" id="loginNavBtn">Ana Sayfa</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Hero -->
+    <section class="rehber-hero">
+        <div class="container">
+            <h1>🛣️ Trafik <span style="color: #FF851B;">Bilgi Merkezi</span></h1>
+            <p>Mevzuat değişiklikleri, güncel duyurular ve sürücülere yönelik teknik bilgilendirmeler.</p>
+        </div>
+    </section>
+
+    <!-- Ana İçerik -->
+    <section class="container section-padding">
+
+        <!-- Filtre Butonları -->
+        <div class="filter-tabs" id="filterTabs">
+            <button class="filter-btn active" data-kategori="tumu" onclick="filterPosts(this)">🗂️ Tümü</button>
+            <button class="filter-btn" data-kategori="Mevzuat" onclick="filterPosts(this)">⚖️ Mevzuat</button>
+            <button class="filter-btn" data-kategori="Duyuru" onclick="filterPosts(this)">📢 Duyuru</button>
+            <button class="filter-btn" data-kategori="Teknik Bilgi" onclick="filterPosts(this)">🔧 Teknik Bilgi</button>
+        </div>
+
+        <!-- Kart Izgarası -->
+        <div class="rehber-grid" id="rehberGrid">
+            <div class="loading-state">
+                <div class="spinner-sm"></div>
+                <p style="color: #64748b; font-weight: 600;">İçerikler yükleniyor...</p>
+            </div>
+        </div>
+
+    </section>
+
+    <footer style="background: var(--navy); color: white; text-align: center; padding: 30px 20px; margin-top: 60px;">
+        <p style="opacity: 0.7; font-size: 14px;">© 2026 TrafikNet · Tüm hakları saklıdır.</p>
+    </footer>
+
+    <script type="module" src="rehber.js"></script>
+
+    <script>
+        // Filtre fonksiyonu (global olarak erişilebilir, module'dan değil)
+        let allPosts = [];
+
+        window.filterPosts = function (btn) {
+            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            const kategori = btn.dataset.kategori;
+            renderCards(kategori === 'tumu' ? allPosts : allPosts.filter(p => p.kategori === kategori));
+        };
+
+        window.setAllPosts = function (posts) {
+            allPosts = posts;
+            renderCards(posts);
+        };
+
+        function renderCards(posts) {
+            const grid = document.getElementById('rehberGrid');
+            if (!posts || posts.length === 0) {
+                grid.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">📭</div>
+                        <h3 style="color: var(--navy); margin-bottom: 8px;">Henüz içerik yok</h3>
+                        <p style="color: #64748b;">Bu kategoride içerik bulunamadı.</p>
+                    </div>`;
+                return;
+            }
+
+            const badges = {
+                'Mevzuat': 'badge-mevzuat',
+                'Duyuru': 'badge-duyuru',
+                'Teknik Bilgi': 'badge-teknik'
+            };
+
+            const icons = {
+                'Mevzuat': '⚖️',
+                'Duyuru': '📢',
+                'Teknik Bilgi': '🔧'
+            };
+
+            grid.innerHTML = posts.map(post => {
+                const dateStr = post.yayinTarihi?.toDate
+                    ? post.yayinTarihi.toDate().toLocaleDateString('tr-TR', { year: 'numeric', month: 'long', day: 'numeric' })
+                    : '1 Mart 2026';
+
+                const badgeClass = badges[post.kategori] || 'badge-mevzuat';
+                const icon = icons[post.kategori] || '📋';
+                const imgHtml = post.gorselUrl
+                    ? `<img src="${post.gorselUrl}" alt="${post.baslik}" class="rehber-card-banner" loading="lazy">`
+                    : `<div class="rehber-card-banner-placeholder">${icon}</div>`;
+
+                return `
+                <a href="rehber-detay.html?slug=${post.slug}" class="rehber-card">
+                    ${imgHtml}
+                    <div class="rehber-card-body">
+                        <div class="rehber-card-meta">
+                            <span class="kategori-badge ${badgeClass}">${post.kategori}</span>
+                            <span class="rehber-card-date">📅 ${dateStr}</span>
+                        </div>
+                        <h2>${post.baslik}</h2>
+                        <p>${post.kisaOz}</p>
+                        <div class="rehber-card-footer">
+                            <span class="btn-oku">Devamını Oku →</span>
+                        </div>
+                    </div>
+                </a>`;
+            }).join('');
+        }
+    </script>
+
+</body>
+
+</html>

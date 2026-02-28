@@ -300,6 +300,8 @@
                         style="background: var(--navy); color: white;">📚 Soru Havuzu</button></li>
                 <li><button class="btn-outline-small" onclick="switchAdminTab('reports')" id="tab-reports">🚨 Hata
                         Bildirimleri</button></li>
+                <li><button class="btn-outline-small" onclick="switchAdminTab('rehber')" id="tab-rehber">📰 Bilgi
+                        Merkezi</button></li>
                 <li><a href="#" class="btn-outline-small" onclick="handleLogout()" style="margin-left: 15px;">Çıkış
                         Yap</a></li>
             </ul>
@@ -468,6 +470,81 @@
                 </table>
             </div>
         </div>
+
+        <!-- Bilgi Merkezi (Rehber) Yönetimi -->
+        <div class="admin-card" id="rehberSection" style="display: none;">
+            <h2 style="color: var(--navy); margin-bottom: 25px; font-size: 20px;">📰 Yeni Bilgi Merkezi Yazısı Ekle</h2>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label">Kategori</label>
+                    <select id="rehberKategori" class="form-select">
+                        <option value="Mevzuat">⚖️ Mevzuat</option>
+                        <option value="Duyuru">📢 Duyuru</option>
+                        <option value="Teknik Bilgi">🔧 Teknik Bilgi</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">SEO Slug (URL Kısmı)</label>
+                    <input type="text" id="rehberSlug" class="form-input" placeholder="ornek-baslik-2026">
+                    <small style="color:#94a3b8;font-size:12px;">Sadece harf, rakam ve tire (-). Otomatik
+                        temizlenir.</small>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Başlık</label>
+                <input type="text" id="rehberBaslik" class="form-input" placeholder="Yazı başlığını girin...">
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Kısa Özet (Liste sayfasında görünür)</label>
+                <textarea id="rehberKisaOz" class="form-input" rows="3"
+                    placeholder="Yazının kısa tanıtım metni..."></textarea>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Tam Metin (HTML destekli)</label>
+                <textarea id="rehberTamMetin" class="form-input" rows="12"
+                    placeholder="&lt;h2&gt;Başlık&lt;/h2&gt;&#10;&lt;p&gt;Paragraf metni...&lt;/p&gt;"></textarea>
+                <small style="color:#94a3b8;font-size:12px;">HTML etiketleri kullanabilirsiniz: &lt;h2&gt;, &lt;h3&gt;,
+                    &lt;p&gt;, &lt;ul&gt;, &lt;li&gt;, &lt;strong&gt;, &lt;table&gt;</small>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Kapak Görseli URL (Opsiyonel)</label>
+                <input type="url" id="rehberGorselUrl" class="form-input" placeholder="https://...">
+            </div>
+
+            <div style="margin-top: 20px; text-align: right;">
+                <button class="btn-orange" style="width: 100%; padding: 15px; font-size: 16px;"
+                    onclick="saveRehberPost()">📰 Yazıyı Firebase'e Kaydet</button>
+            </div>
+
+            <!-- Mevcut Rehber Yazıları -->
+            <h3
+                style="color: var(--navy); margin-top: 40px; margin-bottom: 20px; font-size: 18px; border-top: 2px solid #f1f5f9; padding-top: 30px;">
+                Mevcut Yazılar (<span id="totalRehberCount">0</span>)
+            </h3>
+            <div class="questions-table-wrapper">
+                <table id="rehberTable">
+                    <thead>
+                        <tr>
+                            <th style="width:15%;">Kategori</th>
+                            <th style="width:50%;">Başlık</th>
+                            <th style="width:15%;">Tarih</th>
+                            <th style="width:20%; text-align:right;">İşlem</th>
+                        </tr>
+                    </thead>
+                    <tbody id="rehberTableBody">
+                        <tr>
+                            <td colspan="4" style="text-align:center;">Bilgi Merkezi sekmesine geçin.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
     </div>
 
     <!-- Toast Notification -->

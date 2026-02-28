@@ -1,6 +1,6 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
 import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-import { getFirestore, collection, getDocs, addDoc, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+import { getFirestore, collection, getDocs, addDoc, deleteDoc, doc, query, orderBy, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 import { getStorage, ref, uploadBytesResumable, getDownloadURL, deleteObject } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-storage.js";
 
 const firebaseConfig = {
@@ -300,29 +300,35 @@ function showToast(message) {
 window.switchAdminTab = function (tabName) {
     const qSec = document.getElementById('questionsSection');
     const rSec = document.getElementById('reportsSection');
-    const formSec = document.querySelector('.admin-card:nth-of-type(1)'); // Soru Ekleme Formu
+    const rehberSec = document.getElementById('rehberSection');
+    const formSec = document.querySelector('.admin-card:nth-of-type(1)');
 
-    document.getElementById('tab-questions').style.background = 'transparent';
-    document.getElementById('tab-questions').style.color = 'var(--navy)';
-    document.getElementById('tab-reports').style.background = 'transparent';
-    document.getElementById('tab-reports').style.color = 'var(--navy)';
+    // Tüm tab butonlarını sıfırla
+    ['tab-questions', 'tab-reports', 'tab-rehber'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) { el.style.background = 'transparent'; el.style.color = 'var(--navy)'; }
+    });
+
+    // Tüm section'ları gizle
+    [qSec, rSec, rehberSec].forEach(s => { if (s) s.style.display = 'none'; });
+    if (formSec) formSec.style.display = 'none';
 
     if (tabName === 'questions') {
-        qSec.style.display = 'block';
+        if (qSec) qSec.style.display = 'block';
         if (formSec) formSec.style.display = 'block';
-        rSec.style.display = 'none';
-
         document.getElementById('tab-questions').style.background = 'var(--navy)';
         document.getElementById('tab-questions').style.color = 'white';
         fetchQuestions();
     } else if (tabName === 'reports') {
-        qSec.style.display = 'none';
-        if (formSec) formSec.style.display = 'none'; // Soru ekleme formunu gizle
-        rSec.style.display = 'block';
-
-        document.getElementById('tab-reports').style.background = 'var(--orange)';
-        document.getElementById('tab-reports').style.color = 'white';
+        if (rSec) rSec.style.display = 'block';
+        const btn = document.getElementById('tab-reports');
+        if (btn) { btn.style.background = 'var(--orange)'; btn.style.color = 'white'; }
         loadReports();
+    } else if (tabName === 'rehber') {
+        if (rehberSec) rehberSec.style.display = 'block';
+        const btn = document.getElementById('tab-rehber');
+        if (btn) { btn.style.background = '#10b981'; btn.style.color = 'white'; }
+        loadRehberPosts();
     }
 }
 
@@ -403,9 +409,111 @@ window.deleteReport = async function (reportId) {
     try {
         await deleteDoc(doc(db, "reports", reportId));
         showToast("Bildirim başarıyla silindi. ✔️");
-        loadReports(); // Listeyi güncelle
+        loadReports();
     } catch (err) {
         console.error("Rapor silinirken hata:", err);
         alert("Bildirim silinemedi: " + err.message);
     }
 }
+
+// ================================================================
+// BİLGİ MERKEZİ (REHBER) YÖNETİMİ
+// ================================================================
+
+// Rehber yazılarını listele
+async function loadRehberPosts() {
+    const tbody = document.getElementById('rehberTableBody');
+    const countEl = document.getElementById('totalRehberCount');
+    if (!tbody) return;
+
+    tbody.innerHTML = '<tr><td colspan="4" style="text-align:center">Yükleniyor...</td></tr>';
+
+    try {
+        const q = query(collection(db, "rehber"), orderBy("yayinTarihi", "desc"));
+        const snapshot = await getDocs(q);
+        tbody.innerHTML = '';
+
+        if (snapshot.empty) {
+            tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;color:#64748b;">Henüz rehber yazısı yok.</td></tr>';
+            if (countEl) countEl.innerText = '0';
+            return;
+        }
+
+        let count = 0;
+        snapshot.forEach(d => {
+            count++;
+            const data = d.data();
+            const dateStr = data.yayinTarihi?.toDate
+                ? data.yayinTarihi.toDate().toLocaleDateString('tr-TR')
+                : '—';
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td><span style="font-size:12px;background:#e2e8f0;padding:4px 8px;border-radius:4px;">${data.kategori || '—'}</span></td>
+                <td style="font-weight:600;color:var(--navy);">${data.baslik}</td>
+                <td style="font-size:13px;color:#64748b;">${dateStr}</td>
+                <td style="text-align:right;">
+                    <a href="rehber-detay.html?slug=${data.slug}" target="_blank" style="margin-right:8px;font-size:12px;color:var(--navy);">Görüntüle</a>
+                    <button class="btn-delete" onclick="deleteRehberPost('${d.id}')">Sil</button>
+                </td>`;
+            tbody.appendChild(tr);
+        });
+        if (countEl) countEl.innerText = count;
+
+    } catch (err) {
+        console.error('Rehber listesi hatası:', err);
+        tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;color:red;">Veri çekilirken hata oluştu.</td></tr>';
+    }
+}
+
+// Yeni rehber yazısı ekle
+window.saveRehberPost = async function () {
+    const loader = document.getElementById('loader');
+    const loaderText = document.getElementById('loader-text');
+
+    const baslik = document.getElementById('rehberBaslik')?.value?.trim();
+    const kisaOz = document.getElementById('rehberKisaOz')?.value?.trim();
+    const tamMetin = document.getElementById('rehberTamMetin')?.value?.trim();
+    const kategori = document.getElementById('rehberKategori')?.value;
+    const gorselUrl = document.getElementById('rehberGorselUrl')?.value?.trim();
+    const slugRaw = document.getElementById('rehberSlug')?.value?.trim();
+
+    if (!baslik || !kisaOz || !tamMetin || !slugRaw) {
+        alert('Başlık, kısa özet, tam metin ve slug alanları zorunludur.');
+        return;
+    }
+
+    const slug = slugRaw.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+
+    loader.style.display = 'flex';
+    loaderText.innerText = 'Rehber yazısı kaydediliyor...';
+
+    try {
+        await addDoc(collection(db, 'rehber'), {
+            baslik, kisaOz, tamMetin, kategori, gorselUrl, slug,
+            yayinTarihi: serverTimestamp()
+        });
+        loader.style.display = 'none';
+        showToast('Rehber yazısı başarıyla eklendi! 🎉');
+        // Formu temizle
+        ['rehberBaslik', 'rehberKisaOz', 'rehberTamMetin', 'rehberGorselUrl', 'rehberSlug']
+            .forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
+        loadRehberPosts();
+    } catch (err) {
+        loader.style.display = 'none';
+        console.error('Rehber kayıt hatası:', err);
+        alert('Rehber yazısı kaydedilemedi: ' + err.message);
+    }
+};
+
+// Rehber yazısı sil
+window.deleteRehberPost = async function (docId) {
+    if (!confirm('Bu rehber yazısını kalıcı olarak silmek istediğinize emin misiniz?')) return;
+    try {
+        await deleteDoc(doc(db, 'rehber', docId));
+        showToast('Rehber yazısı silindi. 🗑️');
+        loadRehberPosts();
+    } catch (err) {
+        console.error('Rehber silme hatası:', err);
+        alert('Silme işlemi başarısız: ' + err.message);
+    }
+};
