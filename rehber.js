@@ -1,4 +1,5 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-analytics.js";
 import {
     getFirestore,
     collection,
@@ -16,11 +17,19 @@ const firebaseConfig = {
     projectId: "trafiknet",
     storageBucket: "trafiknet.firebasestorage.app",
     messagingSenderId: "795808534933",
-    appId: "1:795808534933:web:de1c0a7eec1293eb8ce69c"
+    appId: "1:795808534933:web:de1c0a7eec1293eb8ce69c",
+    measurementId: "G-XXXXXXXXXX"
 };
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
+
+// --- GOOGLE ANALYTİCS ---
+try {
+    getAnalytics(app);
+} catch (e) {
+    console.warn("Analytics başlatılamadı:", e);
+}
 
 // ============================================================
 // İLK İÇERİK (SEED DATA) — Koleksiyon boşsa otomatik eklenir

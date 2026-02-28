@@ -1,4 +1,5 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-analytics.js";
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut, sendEmailVerification, updateProfile, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 import { getFirestore, doc, setDoc, updateDoc, increment, getDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
@@ -8,12 +9,20 @@ const firebaseConfig = {
     projectId: "trafiknet",
     storageBucket: "trafiknet.firebasestorage.app",
     messagingSenderId: "795808534933",
-    appId: "1:795808534933:web:de1c0a7eec1293eb8ce69c"
+    appId: "1:795808534933:web:de1c0a7eec1293eb8ce69c",
+    measurementId: "G-XXXXXXXXXX"
 };
 
 const app = initializeApp(firebaseConfig);
 window.auth = getAuth(app); // Global erişim için
 window.db = getFirestore(app);
+
+// --- GOOGLE ANALYTİCS ---
+try {
+    window.analytics = getAnalytics(app);
+} catch (e) {
+    console.warn("Analytics başlatılamadı:", e);
+}
 
 async function registerUser(email, password, fullName) {
     try {
