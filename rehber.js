@@ -412,17 +412,23 @@ function getDkrWidgetHTML() {
                 </div>
             </div>
             <div class="dkr-field">
-                <label class="dkr-label">🔨 Hasar Durumu</label>
-                <select id="dkrHasar" class="dkr-input dkr-select dkr-light-input">
-                    <option value="1.0">Hasarsız / Boya &amp; Çizik</option>
-                    <option value="1.5" selected>Küçük Hasar (Panel, Far vb.)</option>
-                    <option value="2.2">Orta Hasar (Motor Kaputu, Kapı)</option>
-                    <option value="3.0">Büyük Hasar (Yapısal / Kaporta)</option>
-                    <option value="4.0">Ağır Hasar (Şase / Airbag)</option>
-                </select>
+                <label class="dkr-label">📅 Araç Yaşı</label>
+                <div class="dkr-input-wrap">
+                    <input type="number" id="dkrYas" class="dkr-input dkr-light-input" placeholder="Örn: 3" min="0" max="30">
+                    <span class="dkr-unit">Yıl</span>
+                </div>
             </div>
             <div class="dkr-field">
-                <label class="dkr-label">⚖️ Kaza Kusur Oranı</label>
+                <label class="dkr-label">🔨 Hasar Durumu</label>
+                <select id="dkrHasar" class="dkr-input dkr-select dkr-light-input">
+                    <option value="0.1">Boya / Çizik</option>
+                    <option value="0.4" selected>Küçük Ölçekli (Düzeltme)</option>
+                    <option value="0.7">Orta Ölçekli (Parça Değişimi)</option>
+                    <option value="1.0">Büyük / Ağır Hasar</option>
+                </select>
+            </div>
+            <div class="dkr-field" style="grid-column: 1 / -1;">
+                <label class="dkr-label">⚪️ Kaza Kusur Oranı</label>
                 <select id="dkrKusur" class="dkr-input dkr-select dkr-light-input">
                     <option value="0" selected>%0 Kusurluyum (Tam Haklı)</option>
                     <option value="0.25">%25 Kusurluyum</option>
@@ -437,30 +443,21 @@ function getDkrWidgetHTML() {
 
         <div class="dkr-result" id="dkrSonuc" style="display:none;">
             <div class="dkr-result-row">
-                <span class="dkr-result-label">Hasar Katsayısı</span>
+                <span class="dkr-result-label">Baz Tazminat Tavanı</span>
+                <span class="dkr-result-value" id="dkrBaz">—</span>
+            </div>
+            <div class="dkr-result-row">
+                <span class="dkr-result-label">Uygulanan Katsayılar (KM/Yaş/Hasar)</span>
                 <span class="dkr-result-value" id="dkrKatsayi">—</span>
             </div>
-            <div class="dkr-result-row">
-                <span class="dkr-result-label">Baz Tahmini Değer Kaybı</span>
-                <span class="dkr-result-value" id="dkrKayipOran">—</span>
-            </div>
-            <div class="dkr-result-row">
-                <span class="dkr-result-label">Kusur Oranı İndirimi</span>
-                <span class="dkr-result-value dkr-red" id="dkrKusurIndirim">—</span>
-            </div>
-            <div class="dkr-result-row dkr-highlight">
-                <span class="dkr-result-label">Hak Edilen Tazminat</span>
+            <div class="dkr-result-row dkr-highlight" id="dkrTazminatRow">
+                <span class="dkr-result-label">Tahmini Tazminat Tutarı</span>
                 <span class="dkr-result-value" id="dkrKayipTutar">—</span>
             </div>
-            <div class="dkr-result-row">
-                <span class="dkr-result-label">Tazminat Bant Aralığı</span>
-                <span class="dkr-result-value" id="dkrBant" style="font-size:13px;">—</span>
-            </div>
-            <div class="dkr-result-row">
-                <span class="dkr-result-label">Kaza Sonrası Piyasa Değeri</span>
-                <span class="dkr-result-value" id="dkrGuncelDeger" style="color: #666;">—</span>
-            </div>
-            <p class="dkr-disclaimer">⚠️ Bu hesaplama yaklaşık TRAMER yöntemi ve kusur oranına göre yapılmıştır. Kesin değer için bağımsız ekspere ve hukuki danışmanlık alınması önerilir.</p>
+            <p class="dkr-disclaimer">
+                ⚠️ Bu hesaplama bilgilendirme amaçlıdır. Sigorta Tahkim Komisyonu ve Yargıtay kriterlerine göre hesaplanmıştır.
+            </p>
+            <button class="dkr-cta-btn" onclick="window.location.href='mailto:info@trafiknet.com'">📄 Hukuki süreç başlatmak için bir uzmana danışın</button>
         </div>
     </div>`;
 }
@@ -473,55 +470,63 @@ function getDkrWidgetHTML() {
 window.dkrHesapla = function () {
     const piyasa = parseFloat(document.getElementById('dkrFiyat').value);
     const km = parseFloat(document.getElementById('dkrKm').value);
+    const yas = parseFloat(document.getElementById('dkrYas').value);
     const hasar = parseFloat(document.getElementById('dkrHasar').value);
-    const kusur = parseFloat(document.getElementById('dkrKusur').value); // 0 (tam haklı) ile 1 (tam haksız) arası
+    const kusur = parseFloat(document.getElementById('dkrKusur').value);
 
     if (!piyasa || isNaN(piyasa) || piyasa <= 0) { alert('Lütfen geçerli bir piyasa değeri girin.'); return; }
     if (isNaN(km) || km < 0) { alert('Lütfen geçerli bir kilometre değeri girin.'); return; }
+    if (isNaN(yas) || yas < 0) { alert('Lütfen geçerli bir araç yaşı girin.'); return; }
 
-    // KM katsayısı: her 10.000 km için 0.05 ek (maks 1.50)
-    const kmKatsayi = Math.min(1 + (km / 10000) * 0.05, 1.50);
+    // Aşama 1: Baz Tazminat (Tavan - %15)
+    const bazTazminat = piyasa * 0.15;
 
-    // Temel Baz Formül: Piyasa Değeri × 0.15 × hasarKatsayısı × kmKatsayısı
-    const bazTutar = piyasa * 0.15 * hasar * kmKatsayi;
-    const bazOran = (bazTutar / piyasa) * 100;
+    // Aşama 2: KM Katsayısı
+    let kmKat = 1.0;
+    if (km > 120000) kmKat = 0.2;
+    else if (km > 60000) kmKat = 0.4;
+    else if (km > 20000) kmKat = 0.7;
 
-    // Kusur Oranı Filtresi: Haksız olunan kısım kadar tazminattan düşülür
-    const hakEdilenOran = 1.0 - kusur;
-    const hakEdilenTutar = bazTutar * hakEdilenOran;
-    const kusurIndirimTutari = bazTutar - hakEdilenTutar;
+    // Aşama 3: Yaş Katsayısı
+    let yasKat = 1.0;
+    if (yas >= 11) yasKat = 0.1;
+    else if (yas >= 6) yasKat = 0.3;
+    else if (yas >= 3) yasKat = 0.6;
 
-    const guncelDeger = Math.max(piyasa - bazTutar, 0);
+    // Aşama 4: Hasar Şiddeti (Direkt Select value'sundan gelir: 0.1, 0.4, 0.7, 1.0)
+    const hasarKat = hasar;
 
-    // Tazminat bant aralığı (±%15) — hak edilen üzerinden
-    const bantAlt = hakEdilenTutar * 0.85;
-    const bantUst = hakEdilenTutar * 1.15;
+    // Aşama 5: Kusur Oranı Katsayısı (1.0 - kusur: Örn 0.25 kusur => 0.75 haklılık)
+    let kusurKat = 1.0 - kusur;
+    if (kusurKat < 0) kusurKat = 0;
+
+    // Nihai Hesaplama Süzgeci
+    const nihaiTazminat = bazTazminat * kmKat * yasKat * hasarKat * kusurKat;
 
     const formatTL = (n) => n.toLocaleString('tr-TR', { minimumFractionDigits: 0, maximumFractionDigits: 0 }) + ' TL';
 
-    document.getElementById('dkrKatsayi').textContent = 'x' + hasar.toFixed(1) + ' hasar, x' + kmKatsayi.toFixed(2) + ' km';
-    document.getElementById('dkrKayipOran').textContent = formatTL(bazTutar) + ' (%' + Math.min(bazOran, 80).toFixed(1) + ')';
+    document.getElementById('dkrBaz').textContent = formatTL(bazTazminat);
+    document.getElementById('dkrKatsayi').textContent = `x${kmKat} km × x${yasKat} yaş × x${hasarKat} hasar`;
 
-    const kusurIndirimEl = document.getElementById('dkrKusurIndirim');
-    if (kusur > 0) {
-        kusurIndirimEl.textContent = '- ' + formatTL(kusurIndirimTutari) + ' (%' + (kusur * 100) + ' Kusur)';
-        kusurIndirimEl.style.display = 'inline';
-        kusurIndirimEl.parentElement.style.display = 'flex';
+    const sonucRow = document.getElementById('dkrTazminatRow');
+    const kayipTutarEl = document.getElementById('dkrKayipTutar');
+
+    if (kusur === 1.0) {
+        // %100 kusurlu durumu
+        sonucRow.classList.remove('dkr-highlight');
+        sonucRow.classList.add('dkr-error-highlight');
+        sonucRow.style.borderLeft = "4px solid #e53e3e";
+        sonucRow.style.background = "rgba(229, 62, 62, 0.1)";
+        kayipTutarEl.style.color = "#e53e3e";
+        kayipTutarEl.innerHTML = "0 TL <br><span style='font-size:13px;font-weight:500;'>Tazminat hakkı bulunmamaktadır.</span>";
     } else {
-        kusurIndirimEl.parentElement.style.display = 'none';
+        sonucRow.classList.add('dkr-highlight');
+        sonucRow.classList.remove('dkr-error-highlight');
+        sonucRow.style.borderLeft = "4px solid #ff7e21";
+        sonucRow.style.background = "rgba(255, 126, 33, 0.1)";
+        kayipTutarEl.style.color = "#ff7e21";
+        kayipTutarEl.textContent = formatTL(nihaiTazminat);
     }
-
-    document.getElementById('dkrKayipTutar').textContent = formatTL(hakEdilenTutar);
-
-    const bantEl = document.getElementById('dkrBant');
-    if (hakEdilenTutar > 0) {
-        bantEl.textContent = formatTL(bantAlt) + ' — ' + formatTL(bantUst);
-        bantEl.parentElement.style.display = 'flex';
-    } else {
-        bantEl.parentElement.style.display = 'none';
-    }
-
-    document.getElementById('dkrGuncelDeger').textContent = formatTL(guncelDeger);
 
     const sonuc = document.getElementById('dkrSonuc');
     sonuc.style.display = 'block';
