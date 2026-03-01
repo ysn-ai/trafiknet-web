@@ -510,15 +510,55 @@ window.reviewMistakes = function () {
     }
 }
 
-window.showResultScreen = function () {
+window.showResultScreen = async function () {
     document.getElementById('review-screen').style.display = 'none';
     document.getElementById('result-screen').style.display = 'block';
+
+    // Tavsiye Edilen Rehber Yazılarını Yükle (Dwell Time SEO Algoritması)
+    const recBox = document.getElementById('recommendedArticlesBox');
+    const recList = document.getElementById('recommended-articles-list');
+    if (recBox && recList) {
+        try {
+            // App.js'den db'yi al
+            const { db } = await import('./app.js');
+            const { collection, getDocs, query, limit, orderBy } = await import('https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js');
+
+            const qRef = query(collection(db, 'rehber_yazilari'), orderBy('yayinTarihi', 'desc'), limit(3));
+            const snap = await getDocs(qRef);
+
+            if (!snap.empty) {
+                let htmlStr = '';
+                snap.forEach(doc => {
+                    const data = doc.data();
+                    htmlStr += `
+                    <a href="rehber-detay.html?slug=${data.slug}" style="display: flex; align-items: center; justify-content: space-between; padding: 12px 15px; background: white; border: 1px solid #e2e8f0; border-radius: 8px; text-decoration: none; color: var(--navy); transition: all 0.2s; box-shadow: 0 2px 4px rgba(0,0,0,0.02);">
+                        <div style="flex: 1;">
+                            <h4 style="font-size: 15px; margin-bottom: 4px; font-weight: 700;">${data.baslik}</h4>
+                            <span style="font-size: 12px; color: white; background: var(--orange); padding: 2px 8px; border-radius: 12px;">${data.kategori || 'Bilgi'}</span>
+                        </div>
+                        <span style="color: var(--orange); font-size: 18px;">→</span>
+                    </a>`;
+                });
+                recList.innerHTML = htmlStr;
+                recBox.style.display = 'block';
+            } else {
+                recBox.style.display = 'none';
+            }
+        } catch (err) {
+            console.error("Rehber yazıları yüklenirken hata:", err);
+            recBox.style.display = 'none';
+        }
+    }
 }
 
 window.restartExam = function () {
     // Sınavı sıfırla ve yeniden başlat (mevcut kategoriyi ya da mock modunu kullanarak)
     document.getElementById('result-screen').style.display = 'none';
     document.getElementById('review-screen').style.display = 'none';
+
+    // Tavsiye kutusunu da gizle (yeniden sınav esnasında)
+    const recBox = document.getElementById('recommendedArticlesBox');
+    if (recBox) recBox.style.display = 'none';
 
     // Geçen mod hangisiyse, ona göre tekrar çağır
     if (isMockExam) {

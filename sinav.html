@@ -4,10 +4,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sınav Merkezi | Online Deneme Sınavları ve Konu Testleri | TrafikNet</title>
+    <title>Ehliyet Deneme Sınavları ve Çıkmış Sorular | TrafikNet</title>
     <meta name="description"
-        content="TrafikNet Sınav Merkezi'nde 45 dakikalık gerçek zamanlı ehliyet deneme sınavlarını ve özel konu testlerini çözerek başarınızı ölçün.">
-    <meta name="keywords" content="ehliyet deneme sınavı, online ehliyet testi, trafik sınavı, motor test çöz">
+        content="Ücretsiz ehliyet deneme sınavları, MEB müfredatına uygun çıkmış sorular ve gerçek zamanlı motor, itk yardım ve trafik testleri.">
+    <meta name="keywords"
+        content="ehliyet deneme sınavı, çıkmış ehliyet soruları, online trafik sinavi, motor deneme, ilk yardım sınavı">
+    <link rel="canonical" href="https://trafiknet.net/sinav.html" />
     <meta name="google-site-verification" content="NAfYzQgDhrse-8QOBdpSDJVVoQLGKWo62izBh8ZKY2s" />
     <!-- Google Analytics GA4 -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-ZQ55WL7P24"></script>
@@ -170,8 +172,21 @@
                     onclick="reviewMistakes()">Yanlışları İncele 🔍</button>
                 <button class="btn-main" style="width: 100%; margin-bottom: 15px; font-size: 16px; padding: 15px;"
                     onclick="restartExam()">🔄 Testi Tekrar Çöz</button>
-                <button class="btn-outline" style="width: 100%; font-size: 16px; padding: 15px;"
+                <button class="btn-outline" style="width: 100%; font-size: 16px; padding: 15px; margin-bottom: 30px;"
                     onclick="window.location.href='index.html'">Ana Sayfaya Dön 🏠</button>
+
+                <!-- Tavsiye Edilen Rehber İçerikleri (SEO & Dwell Time) -->
+                <div id="recommendedArticlesBox"
+                    style="display: none; text-align: left; background: #f8fafc; padding: 25px; border-radius: 12px; border: 1px solid #e2e8f0; margin-top: 20px;">
+                    <h3
+                        style="color: var(--navy); font-size: 18px; margin-bottom: 15px; border-bottom: 2px solid var(--orange); padding-bottom: 8px; display: inline-block;">
+                        📚 İlgili Bilgi Merkezi Yazıları</h3>
+                    <p style="font-size: 14px; color: #64748b; margin-bottom: 20px;">Sınava hazırlanırken eksiğiniz
+                        olduğunu düşündüğünüz konularda şu rehber yazılarımıza göz atabilirsiniz:</p>
+                    <div id="recommended-articles-list" style="display: grid; grid-template-columns: 1fr; gap: 12px;">
+                        <!-- JS ile doldurulacak -->
+                    </div>
+                </div>
             </div>
 
             <!-- Yanlışları İnceleme Konteyneri -->
@@ -243,6 +258,63 @@
     </script>
     <script type="module" src="main.js"></script>
     <script type="module" src="auth.js"></script>
+
+    <!-- Ulusal Footer -->
+    <footer class="national-footer">
+        <div class="footer-container">
+            <div class="footer-grid">
+                <!-- Logo & Hakkımızda -->
+                <div class="footer-col">
+                    <h3>TrafikNet</h3>
+                    <p>Türkiye'nin en kapsamlı trafik, ehliyet ve sürücü portalı. Amacımız, trafikte bilinçli sürücüler
+                        yetiştirmek ve bilgi kirliliğini önlemektir.</p>
+                    <div class="footer-socials">
+                        <a href="#" class="footer-social-link" aria-label="Facebook">f</a>
+                        <a href="#" class="footer-social-link" aria-label="Twitter">X</a>
+                        <a href="#" class="footer-social-link" aria-label="Instagram">in</a>
+                    </div>
+                </div>
+                <!-- Hızlı Menü -->
+                <div class="footer-col">
+                    <h3>Hızlı Menü</h3>
+                    <ul class="footer-links">
+                        <li><a href="index.html">Ana Sayfa</a></li>
+                        <li><a href="dersler.html">Ders Notları</a></li>
+                        <li><a href="sinav.html?kategori=mock">Deneme Sınavları</a></li>
+                        <li><a href="rehber.html">Bilgi Merkezi</a></li>
+                    </ul>
+                </div>
+                <!-- Yasal Sayfalar -->
+                <div class="footer-col">
+                    <h3>Yasal</h3>
+                    <ul class="footer-links">
+                        <li><a href="#">Kullanım Şartları</a></li>
+                        <li><a href="#">Gizlilik Politikası</a></li>
+                        <li><a href="#">Çerez Politikası</a></li>
+                        <li><a href="#">Aydınlatma Metni</a></li>
+                    </ul>
+                </div>
+                <!-- İletişim -->
+                <div class="footer-col">
+                    <h3>İletişim</h3>
+                    <ul class="footer-contact">
+                        <li>
+                            <span class="icon">✉️</span>
+                            <span>iletisim@trafiknet.net</span>
+                        </li>
+                        <li>
+                            <span class="icon">⚠️</span>
+                            <span>Sistemdeki içerikler bilgilendirme amaçlıdır, hukuki tavsiye içermez.</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p class="footer-bottom-text">&copy; 2026 TrafikNet. Tüm Hakları Saklıdır. | Türkiye'nin Trafik Portalı
+                </p>
+            </div>
+        </div>
+    </footer>
 </body>
 
 </html>

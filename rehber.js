@@ -231,8 +231,23 @@ function renderDetay(post) {
     // Dinamik Meta Güncelleme
     const pageTitle = `${post.baslik} | TrafikNet Rehber`;
     document.title = pageTitle;
+
+    // Detay meta description için 160 karakter kırpma işlemi
+    let safeDescStr = (post.kisaOz || "").substring(0, 160).trim();
+    if (post.kisaOz && post.kisaOz.length > 160) safeDescStr += "...";
+
     let metaDesc = document.querySelector('meta[name="description"]');
-    if (metaDesc) metaDesc.setAttribute('content', post.kisaOz);
+    if (metaDesc) metaDesc.setAttribute('content', safeDescStr);
+
+    // Dinamik Canonical 
+    let canonicalLink = document.querySelector('link[rel="canonical"]');
+    if (!canonicalLink) {
+        canonicalLink = document.createElement('link');
+        canonicalLink.rel = 'canonical';
+        document.head.appendChild(canonicalLink);
+    }
+    const canonicalUrl = `https://trafiknet.net/rehber-detay.html?slug=${post.slug}`;
+    canonicalLink.href = canonicalUrl;
 
     // JSON-LD güncelle
     const dateStr = post.yayinTarihi?.toDate
@@ -245,13 +260,13 @@ function renderDetay(post) {
             "@context": "https://schema.org",
             "@type": "Article",
             "headline": post.baslik,
-            "description": post.kisaOz,
+            "description": safeDescStr,
             "datePublished": dateStr,
-            "url": window.location.href,
+            "url": canonicalUrl,
             "publisher": {
                 "@type": "Organization",
                 "name": "TrafikNet",
-                "url": "https://trafiknet.site",
+                "url": "https://trafiknet.net",
                 "logo": {
                     "@type": "ImageObject",
                     "url": "https://trafiknet.site/app_icon.png"
@@ -385,9 +400,24 @@ function processShortcodes(htmlMetin) {
 // DEĞER KAYBI ROBOTU — Hesaplama Widget'ı HTML'i
 // Formül: Piyasa Değeri × 0.15 × hasarKatsayısı × kmKatsayısı
 // ============================================================
-function getDkrWidgetHTML() {
+function generateRobotHTML() {
     return `
-    <div class="dkr-widget" id="dkrWidget">
+        <script type="application/ld+json">
+        {
+            "@context": "https://schema.org",
+            "@type": "SoftwareApplication",
+            "name": "Araç Değer Kaybı Hesaplama Motoru",
+            "applicationCategory": "CalculatorApplication",
+            "operatingSystem": "All",
+            "offers": {
+                "@type": "Offer",
+                "price": "0",
+                "priceCurrency": "TRY"
+            }
+        }
+        </script>
+        <div class="form-group" style="margin-bottom: 20px;">
+        <div class="dkr-widget" id="dkrWidget">
         <div class="dkr-header">
             <div class="dkr-icon">🚗</div>
             <div>
