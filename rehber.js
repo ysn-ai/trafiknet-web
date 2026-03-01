@@ -18,7 +18,7 @@ const firebaseConfig = {
     storageBucket: "trafiknet.firebasestorage.app",
     messagingSenderId: "795808534933",
     appId: "1:795808534933:web:de1c0a7eec1293eb8ce69c",
-    measurementId: "G-XXXXXXXXXX"
+    measurementId: "G-ZQ55WL7P24"
 };
 
 const app = initializeApp(firebaseConfig);
