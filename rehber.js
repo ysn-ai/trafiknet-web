@@ -293,9 +293,12 @@ function renderDetay(post) {
         gorselEl.style.display = 'block';
     }
 
-    // Tam metin (HTML olarak)
+    // Tam metin (HTML olarak) — shortcode işlenerek render edilir
     const metinEl = document.getElementById('artTamMetin');
-    if (metinEl) metinEl.innerHTML = post.tamMetin || '<p>İçerik bulunamadı.</p>';
+    if (metinEl) {
+        const islenmisMetin = processShortcodes(post.tamMetin || '<p>İçerik bulunamadı.</p>');
+        metinEl.innerHTML = islenmisMetin;
+    }
 }
 
 async function loadOtherPosts(currentId) {
@@ -355,4 +358,119 @@ async function seedFirstPost() {
     } catch (err) {
         console.error("Seed hatası:", err);
     }
+}
+
+// ============================================================
+// SHORTCODE ENGINE
+// Kısa kodları HTML bileşenleriyle eşleştiren evrensel fonksiyon.
+// Yeni widget eklemek için SHORTCODES objesine key/value ekleyin.
+// ============================================================
+const SHORTCODES = {
+    'DEGER_KAYBI_ROBOTU': getDkrWidgetHTML
+};
+
+function processShortcodes(htmlMetin) {
+    for (const [kod, htmlFn] of Object.entries(SHORTCODES)) {
+        const placeholder = `[${kod}]`;
+        if (htmlMetin.includes(placeholder)) {
+            htmlMetin = htmlMetin.replaceAll(placeholder, htmlFn());
+        }
+    }
+    return htmlMetin;
+}
+
+// ============================================================
+// DEĞER KAYBI ROBOTU — Hesaplama Widget'ı HTML'i
+// ============================================================
+function getDkrWidgetHTML() {
+    return `
+    <div class="dkr-widget" id="dkrWidget">
+        <div class="dkr-header">
+            <div class="dkr-icon">🚗</div>
+            <div>
+                <h3 class="dkr-title">Araç Değer Kaybı Hesaplayıcı</h3>
+                <p class="dkr-subtitle">Aracınızın tahmini değer kaybını anında hesaplayın</p>
+            </div>
+        </div>
+
+        <div class="dkr-form">
+            <div class="dkr-field">
+                <label class="dkr-label">💰 Araç Fiyatı (TL)</label>
+                <div class="dkr-input-wrap">
+                    <input type="number" id="dkrFiyat" class="dkr-input" placeholder="Örn: 1000000" min="0" step="1000">
+                    <span class="dkr-unit">TL</span>
+                </div>
+            </div>
+            <div class="dkr-field">
+                <label class="dkr-label">🛣️ Kilometre</label>
+                <div class="dkr-input-wrap">
+                    <input type="number" id="dkrKm" class="dkr-input" placeholder="Örn: 45000" min="0" step="1000">
+                    <span class="dkr-unit">KM</span>
+                </div>
+            </div>
+            <div class="dkr-field">
+                <label class="dkr-label">📅 Araç Yaşı</label>
+                <div class="dkr-input-wrap">
+                    <input type="number" id="dkrYas" class="dkr-input" placeholder="Örn: 3" min="0" max="30">
+                    <span class="dkr-unit">Yıl</span>
+                </div>
+            </div>
+        </div>
+
+        <button class="dkr-btn" onclick="dkrHesapla()">⚡ Hesapla</button>
+
+        <div class="dkr-result" id="dkrSonuc" style="display:none;">
+            <div class="dkr-result-row">
+                <span class="dkr-result-label">Tahmini Değer Kaybı</span>
+                <span class="dkr-result-value" id="dkrKayipOran">—</span>
+            </div>
+            <div class="dkr-result-row dkr-highlight">
+                <span class="dkr-result-label">Güncel Piyasa Değeri</span>
+                <span class="dkr-result-value" id="dkrGuncelDeger">—</span>
+            </div>
+            <div class="dkr-result-row">
+                <span class="dkr-result-label">Kayıp Tutarı</span>
+                <span class="dkr-result-value dkr-red" id="dkrKayipTutar">—</span>
+            </div>
+            <p class="dkr-disclaimer">⚠️ Bu hesaplama yalnızca bilgilendirme amaçlıdır. Gerçek değer için ekspere başvurunuz.</p>
+        </div>
+    </div>
+    <script>
+    function dkrHesapla() {
+        const fiyat = parseFloat(document.getElementById('dkrFiyat').value);
+        const km    = parseFloat(document.getElementById('dkrKm').value);
+        const yas   = parseFloat(document.getElementById('dkrYas').value);
+
+        if (!fiyat || isNaN(fiyat) || fiyat <= 0) { alert('Lütfen geçerli bir araç fiyatı girin.'); return; }
+        if (km < 0 || isNaN(km))                  { alert('Lütfen geçerli bir kilometre değeri girin.'); return; }
+        if (yas < 0 || isNaN(yas))                { alert('Lütfen geçerli bir araç yaşı girin.'); return; }
+
+        // Değer kaybı hesaplama modeli (yaklaşık TRAMER tabanlı)
+        let yasKayip = 0;
+        if      (yas <= 1)  yasKayip = 0.15;
+        else if (yas <= 2)  yasKayip = 0.25;
+        else if (yas <= 3)  yasKayip = 0.35;
+        else if (yas <= 5)  yasKayip = 0.45;
+        else if (yas <= 8)  yasKayip = 0.55;
+        else if (yas <= 12) yasKayip = 0.65;
+        else                yasKayip = 0.70;
+
+        // Her 10.000 km için %1 ek kayıp (maks %20)
+        const kmKayip = Math.min((km / 10000) * 0.01, 0.20);
+        const toplamKayipOrani = Math.min(yasKayip + kmKayip, 0.80);
+
+        const kayipTutar  = fiyat * toplamKayipOrani;
+        const guncelDeger = fiyat - kayipTutar;
+
+        const formatTL = (n) => n.toLocaleString('tr-TR', { minimumFractionDigits: 0, maximumFractionDigits: 0 }) + ' TL';
+
+        document.getElementById('dkrKayipOran').textContent   = '%' + (toplamKayipOrani * 100).toFixed(1);
+        document.getElementById('dkrGuncelDeger').textContent = formatTL(guncelDeger);
+        document.getElementById('dkrKayipTutar').textContent  = '- ' + formatTL(kayipTutar);
+
+        const sonuc = document.getElementById('dkrSonuc');
+        sonuc.style.display = 'block';
+        sonuc.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+    <\/script>`;
 }

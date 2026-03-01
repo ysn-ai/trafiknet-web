@@ -312,6 +312,186 @@
                 padding: 24px 20px;
             }
         }
+
+        /* ============================================================
+           DEĞER KAYBI ROBOTU — Widget Stilleri
+           ============================================================ */
+        .dkr-widget {
+            background: linear-gradient(135deg, #1a2b48 0%, #1e3a5f 100%);
+            border-radius: 16px;
+            padding: 30px;
+            margin: 28px 0;
+            color: white;
+            box-shadow: 0 8px 30px rgba(26, 43, 72, 0.25);
+        }
+
+        .dkr-header {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .dkr-icon {
+            font-size: 42px;
+            line-height: 1;
+        }
+
+        .dkr-title {
+            font-size: 18px;
+            font-weight: 800;
+            color: white;
+            margin: 0 0 4px;
+        }
+
+        .dkr-subtitle {
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.65);
+            margin: 0;
+        }
+
+        .dkr-form {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 14px;
+            margin-bottom: 18px;
+        }
+
+        .dkr-field {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .dkr-label {
+            font-size: 12px;
+            font-weight: 700;
+            color: rgba(255, 255, 255, 0.75);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .dkr-input-wrap {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .dkr-input {
+            width: 100%;
+            padding: 12px 44px 12px 14px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1.5px solid rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            color: white;
+            font-size: 15px;
+            font-family: inherit;
+            font-weight: 600;
+            outline: none;
+            transition: border-color 0.2s, background 0.2s;
+        }
+
+        .dkr-input::placeholder {
+            color: rgba(255, 255, 255, 0.35);
+        }
+
+        .dkr-input:focus {
+            border-color: #ff7e21;
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .dkr-unit {
+            position: absolute;
+            right: 12px;
+            font-size: 11px;
+            font-weight: 700;
+            color: rgba(255, 255, 255, 0.45);
+            pointer-events: none;
+        }
+
+        .dkr-btn {
+            width: 100%;
+            padding: 14px;
+            background: #ff7e21;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 15px;
+            font-weight: 800;
+            font-family: inherit;
+            cursor: pointer;
+            transition: background 0.2s, transform 0.15s;
+            margin-bottom: 0;
+        }
+
+        .dkr-btn:hover {
+            background: #e66c1b;
+            transform: translateY(-2px);
+        }
+
+        .dkr-btn:active {
+            transform: translateY(0);
+        }
+
+        .dkr-result {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 18px;
+        }
+
+        .dkr-result-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .dkr-result-row:last-of-type {
+            border-bottom: none;
+        }
+
+        .dkr-highlight {
+            background: rgba(255, 126, 33, 0.15);
+            border-radius: 8px;
+            padding: 10px 12px;
+            margin: 4px -4px;
+        }
+
+        .dkr-result-label {
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.7);
+            font-weight: 600;
+        }
+
+        .dkr-result-value {
+            font-size: 16px;
+            font-weight: 800;
+            color: white;
+        }
+
+        .dkr-red {
+            color: #fca5a5;
+        }
+
+        .dkr-disclaimer {
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.45);
+            margin: 12px 0 0;
+            line-height: 1.5;
+        }
+
+        @media (max-width: 480px) {
+            .dkr-widget {
+                padding: 20px 16px;
+            }
+
+            .dkr-form {
+                grid-template-columns: 1fr;
+            }
+        }
     </style>
 </head>
 
