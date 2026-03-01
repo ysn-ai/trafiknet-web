@@ -37,7 +37,10 @@
                 <img src="app_icon.png" alt="TrafikNet Logo" class="logo-img">
                 <div class="logo-text">Trafik<span>Net</span></div>
             </div>
-            <ul class="nav-links">
+            <button class="hamburger" id="hamburger" aria-label="Menü" onclick="toggleMobileMenu()">
+                <span></span><span></span><span></span>
+            </button>
+            <ul class="nav-links" id="navLinks">
                 <li id="navReturnHome" style="display: none;"><a href="#" onclick="closeProfile()">Ana Sayfaya Dön</a>
                 </li>
                 <li><a href="dersler.html">Ders Notları</a></li>
@@ -47,6 +50,7 @@
             </ul>
         </div>
     </nav>
+    <div class="nav-overlay" id="navOverlay" onclick="closeMobileMenu()"></div>
 
     <!-- Ana Sayfa Görünümü -->
     <div id="mainView">
@@ -551,6 +555,23 @@
         </div>
     </div>
 
+    <script>
+        function toggleMobileMenu() {
+            const nav = document.getElementById('navLinks');
+            const btn = document.getElementById('hamburger');
+            const overlay = document.getElementById('navOverlay');
+            nav.classList.toggle('open');
+            btn.classList.toggle('open');
+            overlay.classList.toggle('open');
+            document.body.style.overflow = nav.classList.contains('open') ? 'hidden' : '';
+        }
+        function closeMobileMenu() {
+            document.getElementById('navLinks').classList.remove('open');
+            document.getElementById('hamburger').classList.remove('open');
+            document.getElementById('navOverlay').classList.remove('open');
+            document.body.style.overflow = '';
+        }
+    </script>
     <script type="module" src="main.js"></script>
     <script type="module" src="auth.js"></script>
 </body>

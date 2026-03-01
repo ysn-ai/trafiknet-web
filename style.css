@@ -1404,3 +1404,308 @@ body {
     color: var(--orange);
     text-decoration: none;
 }
+
+/* ================================================================
+   HAMBURGER MENÜ
+   ================================================================ */
+.hamburger {
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    gap: 5px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 6px;
+    z-index: 200;
+}
+
+.hamburger span {
+    display: block;
+    width: 26px;
+    height: 3px;
+    background: var(--navy);
+    border-radius: 3px;
+    transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.hamburger.open span:nth-child(1) {
+    transform: translateY(8px) rotate(45deg);
+}
+
+.hamburger.open span:nth-child(2) {
+    opacity: 0;
+    transform: scaleX(0);
+}
+
+.hamburger.open span:nth-child(3) {
+    transform: translateY(-8px) rotate(-45deg);
+}
+
+/* ================================================================
+   MOBİL BREAKPOINT — 768px ve altı
+   ================================================================ */
+@media (max-width: 768px) {
+
+    /* --- NAVBAR --- */
+    .hamburger {
+        display: flex;
+    }
+
+    .nav-links {
+        position: fixed;
+        top: 0;
+        right: -100%;
+        width: 75%;
+        max-width: 320px;
+        height: 100vh;
+        background: white;
+        flex-direction: column;
+        align-items: flex-start;
+        justify-content: flex-start;
+        padding: 80px 30px 40px;
+        gap: 0;
+        box-shadow: -10px 0 40px rgba(0, 0, 0, 0.12);
+        transition: right 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+        z-index: 150;
+        overflow-y: auto;
+    }
+
+    .nav-links.open {
+        right: 0;
+    }
+
+    .nav-links li {
+        width: 100%;
+        border-bottom: 1px solid #f1f5f9;
+    }
+
+    .nav-links li:last-child {
+        border-bottom: none;
+        margin-top: 20px;
+    }
+
+    .nav-links a,
+    .nav-links button {
+        display: block;
+        width: 100%;
+        padding: 14px 0;
+        font-size: 16px;
+        font-weight: 600;
+        color: var(--navy) !important;
+        text-decoration: none;
+    }
+
+    .nav-links .btn-orange {
+        display: inline-block;
+        width: auto;
+        margin-top: 10px;
+    }
+
+    /* Nav overlay (arka plan karartma) */
+    .nav-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.4);
+        z-index: 140;
+        display: none;
+    }
+
+    .nav-overlay.open {
+        display: block;
+    }
+
+    /* --- HERO --- */
+    .hero {
+        padding: 70px 0 60px;
+    }
+
+    .hero h1 {
+        font-size: clamp(1.8rem, 7vw, 2.4rem);
+        line-height: 1.3;
+        padding: 0 10px;
+    }
+
+    .hero p {
+        font-size: 15px;
+        padding: 0 10px;
+    }
+
+    .hero-btns {
+        flex-direction: column;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .hero-btns a,
+    .hero-btns button {
+        width: 100%;
+        max-width: 300px;
+        text-align: center;
+    }
+
+    /* --- SECTIONS --- */
+    .section-padding {
+        padding: 50px 0;
+    }
+
+    .section-title {
+        font-size: 22px;
+        margin-bottom: 30px;
+    }
+
+    /* --- GRIDS --- */
+    .grid-lessons {
+        grid-template-columns: 1fr;
+    }
+
+    .steps-grid {
+        grid-template-columns: 1fr;
+        gap: 24px;
+    }
+
+    .pricing-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .lawyer-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .features-grid {
+        flex-direction: column;
+    }
+
+    .feature-card {
+        min-width: unset;
+    }
+
+    /* --- QUIZ CONTAINER --- */
+    .quiz-container {
+        padding: 20px 15px;
+        border-radius: 12px;
+        margin: 0 10px;
+    }
+
+    .quiz-header {
+        flex-direction: column;
+        gap: 8px;
+        align-items: flex-start;
+    }
+
+    .question-text {
+        font-size: 17px;
+        margin-bottom: 20px;
+    }
+
+    .option-btn {
+        padding: 14px 14px;
+        font-size: 14px;
+    }
+
+    /* --- STATS --- */
+    .stats-grid {
+        flex-direction: column;
+        align-items: center;
+        gap: 20px;
+    }
+
+    .stat-item {
+        min-width: unset;
+        width: 100%;
+        max-width: 280px;
+    }
+
+    /* --- PROFILE DASHBOARD --- */
+    .profile-dashboard-layout {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+
+    .profile-sidebar {
+        position: static;
+    }
+
+    .profile-stats-grid {
+        grid-template-columns: 1fr;
+    }
+
+    /* --- MODAL --- */
+    .modal-content {
+        padding: 24px 18px;
+        margin: 10% auto;
+        width: 95%;
+    }
+
+    /* --- CARDS --- */
+    .lesson-card {
+        padding: 20px 15px;
+    }
+
+    .pricing-card {
+        padding: 28px 20px;
+    }
+
+    /* --- ACCORDION --- */
+    .accordion-header {
+        padding: 16px 18px;
+    }
+
+    .accordion-header h3 {
+        font-size: 15px;
+    }
+
+    .accordion-item.active .accordion-content {
+        padding: 18px;
+    }
+}
+
+/* ================================================================
+   KÜÇÜK MOBİL — 480px ve altı
+   ================================================================ */
+@media (max-width: 480px) {
+    .hero {
+        padding: 55px 0 45px;
+    }
+
+    .hero h1 {
+        font-size: 1.65rem;
+    }
+
+    .container {
+        padding: 0 14px;
+    }
+
+    .logo-text {
+        font-size: 20px;
+    }
+
+    .logo-img {
+        width: 32px;
+        height: 32px;
+    }
+
+    .quiz-container {
+        padding: 16px 12px;
+        margin: 0 6px;
+    }
+
+    .question-text {
+        font-size: 15px;
+    }
+
+    .option-btn {
+        padding: 12px 12px;
+        font-size: 13px;
+    }
+
+    .btn-orange,
+    .btn-main {
+        padding: 12px 20px;
+        font-size: 14px;
+    }
+
+    .section-title {
+        font-size: 19px;
+    }
+}
