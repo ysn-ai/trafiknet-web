@@ -381,6 +381,7 @@ function processShortcodes(htmlMetin) {
 
 // ============================================================
 // DEĞER KAYBI ROBOTU — Hesaplama Widget'ı HTML'i
+// Formül: Piyasa Değeri × 0.15 × hasarKatsayısı × kmKatsayısı
 // ============================================================
 function getDkrWidgetHTML() {
     return `
@@ -389,15 +390,15 @@ function getDkrWidgetHTML() {
             <div class="dkr-icon">🚗</div>
             <div>
                 <h3 class="dkr-title">Araç Değer Kaybı Hesaplayıcı</h3>
-                <p class="dkr-subtitle">Aracınızın tahmini değer kaybını anında hesaplayın</p>
+                <p class="dkr-subtitle">Kaza sonrası tahmini değer kaybını TRAMER katsayılarıyla hesaplayın</p>
             </div>
         </div>
 
         <div class="dkr-form">
             <div class="dkr-field">
-                <label class="dkr-label">💰 Araç Fiyatı (TL)</label>
+                <label class="dkr-label">💰 Piyasa Değeri (TL)</label>
                 <div class="dkr-input-wrap">
-                    <input type="number" id="dkrFiyat" class="dkr-input" placeholder="Örn: 1000000" min="0" step="1000">
+                    <input type="number" id="dkrFiyat" class="dkr-input" placeholder="Örn: 1500000" min="0" step="10000">
                     <span class="dkr-unit">TL</span>
                 </div>
             </div>
@@ -409,64 +410,71 @@ function getDkrWidgetHTML() {
                 </div>
             </div>
             <div class="dkr-field">
-                <label class="dkr-label">📅 Araç Yaşı</label>
-                <div class="dkr-input-wrap">
-                    <input type="number" id="dkrYas" class="dkr-input" placeholder="Örn: 3" min="0" max="30">
-                    <span class="dkr-unit">Yıl</span>
-                </div>
+                <label class="dkr-label">🔨 Hasar Durumu</label>
+                <select id="dkrHasar" class="dkr-input dkr-select">
+                    <option value="1.0">Hasarsız / Boya &amp; Çizik</option>
+                    <option value="1.5" selected>Küçük Hasar (Panel, Far vb.)</option>
+                    <option value="2.2">Orta Hasar (Motor Kaputu, Kapı)</option>
+                    <option value="3.0">Büyük Hasar (Yapısal / Kaporta)</option>
+                    <option value="4.0">Ağır Hasar (Şase / Airbag)</option>
+                </select>
             </div>
         </div>
 
-        <button class="dkr-btn" onclick="dkrHesapla()">⚡ Hesapla</button>
+        <button class="dkr-btn" onclick="dkrHesapla()">⚡ Değer Kaybını Hesapla</button>
 
         <div class="dkr-result" id="dkrSonuc" style="display:none;">
             <div class="dkr-result-row">
-                <span class="dkr-result-label">Tahmini Değer Kaybı</span>
+                <span class="dkr-result-label">Hasar Katsayısı</span>
+                <span class="dkr-result-value" id="dkrKatsayi">—</span>
+            </div>
+            <div class="dkr-result-row">
+                <span class="dkr-result-label">Tahmini Değer Kaybı (%)</span>
                 <span class="dkr-result-value" id="dkrKayipOran">—</span>
             </div>
             <div class="dkr-result-row dkr-highlight">
-                <span class="dkr-result-label">Güncel Piyasa Değeri</span>
-                <span class="dkr-result-value" id="dkrGuncelDeger">—</span>
+                <span class="dkr-result-label">Tahmini Tazminat Tutarı</span>
+                <span class="dkr-result-value" id="dkrKayipTutar">—</span>
             </div>
             <div class="dkr-result-row">
-                <span class="dkr-result-label">Kayıp Tutarı</span>
-                <span class="dkr-result-value dkr-red" id="dkrKayipTutar">—</span>
+                <span class="dkr-result-label">Tazminat Bant Aralığı</span>
+                <span class="dkr-result-value" id="dkrBant" style="font-size:13px;">—</span>
             </div>
-            <p class="dkr-disclaimer">⚠️ Bu hesaplama yalnızca bilgilendirme amaçlıdır. Gerçek değer için ekspere başvurunuz.</p>
+            <div class="dkr-result-row">
+                <span class="dkr-result-label">Kaza Sonrası Piyasa Değeri</span>
+                <span class="dkr-result-value dkr-red" id="dkrGuncelDeger">—</span>
+            </div>
+            <p class="dkr-disclaimer">⚠️ Bu hesaplama yaklaşık TRAMER yöntemiyle yapılmıştır. Kesin değer için bağımsız ekspere ve hukuki danışmanlık alınması önerilir.</p>
         </div>
     </div>
     <script>
     function dkrHesapla() {
-        const fiyat = parseFloat(document.getElementById('dkrFiyat').value);
-        const km    = parseFloat(document.getElementById('dkrKm').value);
-        const yas   = parseFloat(document.getElementById('dkrYas').value);
+        const piyasa = parseFloat(document.getElementById('dkrFiyat').value);
+        const km     = parseFloat(document.getElementById('dkrKm').value);
+        const hasar  = parseFloat(document.getElementById('dkrHasar').value);
 
-        if (!fiyat || isNaN(fiyat) || fiyat <= 0) { alert('Lütfen geçerli bir araç fiyatı girin.'); return; }
-        if (km < 0 || isNaN(km))                  { alert('Lütfen geçerli bir kilometre değeri girin.'); return; }
-        if (yas < 0 || isNaN(yas))                { alert('Lütfen geçerli bir araç yaşı girin.'); return; }
+        if (!piyasa || isNaN(piyasa) || piyasa <= 0) { alert('Lütfen geçerli bir piyasa değeri girin.'); return; }
+        if (isNaN(km) || km < 0) { alert('Lütfen geçerli bir kilometre değeri girin.'); return; }
 
-        // Değer kaybı hesaplama modeli (yaklaşık TRAMER tabanlı)
-        let yasKayip = 0;
-        if      (yas <= 1)  yasKayip = 0.15;
-        else if (yas <= 2)  yasKayip = 0.25;
-        else if (yas <= 3)  yasKayip = 0.35;
-        else if (yas <= 5)  yasKayip = 0.45;
-        else if (yas <= 8)  yasKayip = 0.55;
-        else if (yas <= 12) yasKayip = 0.65;
-        else                yasKayip = 0.70;
+        // KM katsayısı: her 10.000 km için 0.05 ek (maks 1.50)
+        const kmKatsayi = Math.min(1 + (km / 10000) * 0.05, 1.50);
 
-        // Her 10.000 km için %1 ek kayıp (maks %20)
-        const kmKayip = Math.min((km / 10000) * 0.01, 0.20);
-        const toplamKayipOrani = Math.min(yasKayip + kmKayip, 0.80);
+        // Temel formül: Piyasa Değeri × 0.15 × hasarKatsayısı × kmKatsayısı
+        const kayipTutar  = piyasa * 0.15 * hasar * kmKatsayi;
+        const kayipOrani  = (kayipTutar / piyasa) * 100;
+        const guncelDeger = Math.max(piyasa - kayipTutar, 0);
 
-        const kayipTutar  = fiyat * toplamKayipOrani;
-        const guncelDeger = fiyat - kayipTutar;
+        // Tazminat bant aralığı (±%15)
+        const bantAlt = kayipTutar * 0.85;
+        const bantUst = kayipTutar * 1.15;
 
         const formatTL = (n) => n.toLocaleString('tr-TR', { minimumFractionDigits: 0, maximumFractionDigits: 0 }) + ' TL';
 
-        document.getElementById('dkrKayipOran').textContent   = '%' + (toplamKayipOrani * 100).toFixed(1);
+        document.getElementById('dkrKatsayi').textContent     = 'x' + hasar.toFixed(1) + ' hasar, x' + kmKatsayi.toFixed(2) + ' km';
+        document.getElementById('dkrKayipOran').textContent   = '%' + Math.min(kayipOrani, 80).toFixed(1);
+        document.getElementById('dkrKayipTutar').textContent  = formatTL(kayipTutar);
+        document.getElementById('dkrBant').textContent        = formatTL(bantAlt) + ' — ' + formatTL(bantUst);
         document.getElementById('dkrGuncelDeger').textContent = formatTL(guncelDeger);
-        document.getElementById('dkrKayipTutar').textContent  = '- ' + formatTL(kayipTutar);
 
         const sonuc = document.getElementById('dkrSonuc');
         sonuc.style.display = 'block';
