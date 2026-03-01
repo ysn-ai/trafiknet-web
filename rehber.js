@@ -446,39 +446,43 @@ function getDkrWidgetHTML() {
             </div>
             <p class="dkr-disclaimer">⚠️ Bu hesaplama yaklaşık TRAMER yöntemiyle yapılmıştır. Kesin değer için bağımsız ekspere ve hukuki danışmanlık alınması önerilir.</p>
         </div>
-    </div>
-    <script>
-    function dkrHesapla() {
-        const piyasa = parseFloat(document.getElementById('dkrFiyat').value);
-        const km     = parseFloat(document.getElementById('dkrKm').value);
-        const hasar  = parseFloat(document.getElementById('dkrHasar').value);
-
-        if (!piyasa || isNaN(piyasa) || piyasa <= 0) { alert('Lütfen geçerli bir piyasa değeri girin.'); return; }
-        if (isNaN(km) || km < 0) { alert('Lütfen geçerli bir kilometre değeri girin.'); return; }
-
-        // KM katsayısı: her 10.000 km için 0.05 ek (maks 1.50)
-        const kmKatsayi = Math.min(1 + (km / 10000) * 0.05, 1.50);
-
-        // Temel formül: Piyasa Değeri × 0.15 × hasarKatsayısı × kmKatsayısı
-        const kayipTutar  = piyasa * 0.15 * hasar * kmKatsayi;
-        const kayipOrani  = (kayipTutar / piyasa) * 100;
-        const guncelDeger = Math.max(piyasa - kayipTutar, 0);
-
-        // Tazminat bant aralığı (±%15)
-        const bantAlt = kayipTutar * 0.85;
-        const bantUst = kayipTutar * 1.15;
-
-        const formatTL = (n) => n.toLocaleString('tr-TR', { minimumFractionDigits: 0, maximumFractionDigits: 0 }) + ' TL';
-
-        document.getElementById('dkrKatsayi').textContent     = 'x' + hasar.toFixed(1) + ' hasar, x' + kmKatsayi.toFixed(2) + ' km';
-        document.getElementById('dkrKayipOran').textContent   = '%' + Math.min(kayipOrani, 80).toFixed(1);
-        document.getElementById('dkrKayipTutar').textContent  = formatTL(kayipTutar);
-        document.getElementById('dkrBant').textContent        = formatTL(bantAlt) + ' — ' + formatTL(bantUst);
-        document.getElementById('dkrGuncelDeger').textContent = formatTL(guncelDeger);
-
-        const sonuc = document.getElementById('dkrSonuc');
-        sonuc.style.display = 'block';
-        sonuc.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-    }
-    <\/script>`;
+    </div>`;
 }
+
+// ============================================================
+// DEGER KAYBI ROBOTU — Hesaplama fonksiyonu (global window ile)
+// innerHTML içine konulan <script> tagleri tarayıcı tarafından
+// çalıştırılmaz; bu yüzden fonksiyon modül düzeyinde tanımlandı.
+// ============================================================
+window.dkrHesapla = function () {
+    const piyasa = parseFloat(document.getElementById('dkrFiyat').value);
+    const km = parseFloat(document.getElementById('dkrKm').value);
+    const hasar = parseFloat(document.getElementById('dkrHasar').value);
+
+    if (!piyasa || isNaN(piyasa) || piyasa <= 0) { alert('Lütfen geçerli bir piyasa değeri girin.'); return; }
+    if (isNaN(km) || km < 0) { alert('Lütfen geçerli bir kilometre değeri girin.'); return; }
+
+    // KM katsayısı: her 10.000 km için 0.05 ek (maks 1.50)
+    const kmKatsayi = Math.min(1 + (km / 10000) * 0.05, 1.50);
+
+    // Temel formül: Piyasa Değeri × 0.15 × hasarKatsayısı × kmKatsayısı
+    const kayipTutar = piyasa * 0.15 * hasar * kmKatsayi;
+    const kayipOrani = (kayipTutar / piyasa) * 100;
+    const guncelDeger = Math.max(piyasa - kayipTutar, 0);
+
+    // Tazminat bant aralığı (±%15)
+    const bantAlt = kayipTutar * 0.85;
+    const bantUst = kayipTutar * 1.15;
+
+    const formatTL = (n) => n.toLocaleString('tr-TR', { minimumFractionDigits: 0, maximumFractionDigits: 0 }) + ' TL';
+
+    document.getElementById('dkrKatsayi').textContent = 'x' + hasar.toFixed(1) + ' hasar, x' + kmKatsayi.toFixed(2) + ' km';
+    document.getElementById('dkrKayipOran').textContent = '%' + Math.min(kayipOrani, 80).toFixed(1);
+    document.getElementById('dkrKayipTutar').textContent = formatTL(kayipTutar);
+    document.getElementById('dkrBant').textContent = formatTL(bantAlt) + ' — ' + formatTL(bantUst);
+    document.getElementById('dkrGuncelDeger').textContent = formatTL(guncelDeger);
+
+    const sonuc = document.getElementById('dkrSonuc');
+    sonuc.style.display = 'block';
+    sonuc.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+};
