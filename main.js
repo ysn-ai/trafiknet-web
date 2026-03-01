@@ -531,6 +531,7 @@ window.restartExam = function () {
 // Modaller ve Kaydırma
 window.scrollToElement = function (id) { const el = document.getElementById(id); if (el) el.scrollIntoView({ behavior: 'smooth' }); }
 window.openModal = function () {
+    if (typeof closeMobileMenu === 'function') closeMobileMenu();
     document.getElementById('loginModal').style.display = 'block';
     toggleAuth('login'); // Modal açıldığında varsayılan olarak Giriş Yap gelsin
 }
@@ -645,6 +646,7 @@ window.openProfile = function () {
 }
 
 window.closeProfile = function () {
+    if (typeof closeMobileMenu === 'function') closeMobileMenu();
     const mainView = document.getElementById('mainView');
     const profileSection = document.getElementById('profileSection');
     const navReturnHome = document.getElementById('navReturnHome');
