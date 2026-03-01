@@ -371,9 +371,11 @@ const SHORTCODES = {
 
 function processShortcodes(htmlMetin) {
     for (const [kod, htmlFn] of Object.entries(SHORTCODES)) {
-        const placeholder = `[${kod}]`;
-        if (htmlMetin.includes(placeholder)) {
-            htmlMetin = htmlMetin.replaceAll(placeholder, htmlFn());
+        // [DEGER_KAYBI_ROBOTU] veya boşluk kalmışsa bile yakalamak için RegExp
+        // g: global (tümünü bul), i: case-insensitive (büyük-küçük harf duyarsız)
+        const regex = new RegExp(`\\[\\s*${kod}\\s*\\]`, 'gi');
+        if (regex.test(htmlMetin)) {
+            htmlMetin = htmlMetin.replace(regex, htmlFn());
         }
     }
     return htmlMetin;
