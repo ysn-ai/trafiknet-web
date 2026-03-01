@@ -316,9 +316,9 @@
 
         <!-- Add Question Card -->
         <div class="admin-card">
-            <h2 style="color: var(--navy); margin-bottom: 25px; font-size: 20px;">Yeni Soru Ekle</h2>
+            <h2 id="soruFormTitle" style="color: var(--navy); margin-bottom: 25px; font-size: 20px;">Yeni Soru Ekle</h2>
 
-            <form id="addQuestionForm">
+            <form id="addQuestionForm" data-edit-id="">
                 <div class="form-row">
                     <div class="form-group">
                         <label class="form-label">Kategori</label>
@@ -415,11 +415,13 @@
                     </div>
                 </div>
 
-                <div style="margin-top: 30px; text-align: right;">
-                    <button type="submit" class="btn-orange" style="width: 100%; padding: 15px; font-size: 16px;"
+                <div style="margin-top: 30px; display: flex; gap: 15px; justify-content: flex-end;">
+                    <button type="button" class="btn-outline-small" id="cancelQuestionBtn"
+                        onclick="window.cancelEditQuestion()"
+                        style="display: none; padding: 15px 25px; font-size: 15px;">İptal</button>
+                    <button type="submit" class="btn-orange" style="padding: 15px 40px; font-size: 16px;"
                         id="saveQuestionBtn">Soruyu Firebase'e Kaydet</button>
                 </div>
-            </form>
             </form>
         </div>
 
@@ -473,9 +475,10 @@
 
         <!-- Bilgi Merkezi (Rehber) Yönetimi -->
         <div class="admin-card" id="rehberSection" style="display: none;">
-            <h2 style="color: var(--navy); margin-bottom: 25px; font-size: 20px;">📰 Yeni Bilgi Merkezi Yazısı Ekle</h2>
+            <h2 id="rehberFormTitle" style="color: var(--navy); margin-bottom: 25px; font-size: 20px;">📰 Yeni Bilgi
+                Merkezi Yazısı Ekle</h2>
 
-            <div class="form-row">
+            <div class="form-row" id="rehberFormWrapper" data-edit-id="">
                 <div class="form-group">
                     <label class="form-label">Kategori</label>
                     <select id="rehberKategori" class="form-select">
@@ -516,8 +519,10 @@
                 <input type="url" id="rehberGorselUrl" class="form-input" placeholder="https://...">
             </div>
 
-            <div style="margin-top: 20px; text-align: right;">
-                <button class="btn-orange" style="width: 100%; padding: 15px; font-size: 16px;"
+            <div style="margin-top: 20px; display: flex; gap: 15px; justify-content: flex-end;">
+                <button type="button" class="btn-outline-small" id="cancelRehberBtn" onclick="window.cancelEditRehber()"
+                    style="display: none; padding: 15px 25px; font-size: 15px;">İptal</button>
+                <button class="btn-orange" id="saveRehberBtn" style="padding: 15px 40px; font-size: 16px;"
                     onclick="saveRehberPost()">📰 Yazıyı Firebase'e Kaydet</button>
             </div>
 

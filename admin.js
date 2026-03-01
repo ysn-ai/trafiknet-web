@@ -1,6 +1,6 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
 import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-import { getFirestore, collection, getDocs, addDoc, deleteDoc, doc, query, orderBy, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+import { getFirestore, collection, getDocs, addDoc, updateDoc, deleteDoc, doc, query, orderBy, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 import { getStorage, ref, uploadBytesResumable, getDownloadURL, deleteObject } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-storage.js";
 
 const firebaseConfig = {
@@ -110,7 +110,19 @@ document.getElementById('addQuestionForm').addEventListener('submit', async (e) 
         let imageUrl = "";
         let hasImageOptions = false;
 
-        // 1. Ana Görseli Yükle
+        // Düzenleme (Edit) kontrolü
+        const editId = document.getElementById('addQuestionForm').getAttribute('data-edit-id');
+        let mevcutSoru = null;
+
+        if (editId) {
+            mevcutSoru = globalQuestionsConfig.find(q => q.id === editId);
+            // Düzenleme modunda resim seçilmemişse eski resmi koru
+            if (mevcutSoru && mevcutSoru.imageUrl) {
+                imageUrl = mevcutSoru.imageUrl;
+            }
+        }
+
+        // 1. Ana Görseli Yükle (Yeni resim varsa eskisini ezeriz)
         const mainImageFile = document.getElementById('mainImage').files[0];
         if (mainImageFile) {
             imageUrl = await uploadImageToStorage(mainImageFile, 'questions');
@@ -132,18 +144,26 @@ document.getElementById('addQuestionForm').addEventListener('submit', async (e) 
             const textValue = document.getElementById(el.textId).value;
 
             if (file) {
-                // Eğer şıkta resim seçilmişse metni yok say ve URL olarak dön
+                // Eğer şıkta yeni resim seçilmişse yükle
                 const optUrl = await uploadImageToStorage(file, 'options');
-                // Format: "A) https://firebasestorage..." (Ana sınav motoruna uyumlu)
                 finalSecenekler.push(`${el.id}) ${optUrl}`);
                 hasImageOptions = true;
             } else {
-                // Sadece metin varsa: "A) Şık metni..."
+                // Sadece metin varsa veya eski resim varsa koru
+                if (mevcutSoru && mevcutSoru.secenekler && mevcutSoru.secenekler[i]) {
+                    const eskiOpt = mevcutSoru.secenekler[i];
+                    // Eğer eşkiden resim varsa ve değiştirilmediyse / metin girilmediyse koru (eskiURL)
+                    if (eskiOpt.includes('http') && !textValue) {
+                        finalSecenekler.push(eskiOpt);
+                        hasImageOptions = true;
+                        continue;
+                    }
+                }
                 finalSecenekler.push(`${el.id}) ${textValue || "Boş Şık"}`);
             }
         }
 
-        // 3. Firestore'a Kaydet
+        // 3. Firestore'a Kaydet veya Güncelle
         const questionData = {
             kategori: kategori,
             soru: soru,
@@ -153,17 +173,23 @@ document.getElementById('addQuestionForm').addEventListener('submit', async (e) 
             secenekler: finalSecenekler
         };
 
-        await addDoc(collection(db, "questions"), questionData);
+        if (editId) {
+            await updateDoc(doc(db, "questions", editId), questionData);
+            showToast("Soru başarıyla güncellendi! ✅");
+            window.cancelEditQuestion(); // Formu sıfırla
+        } else {
+            await addDoc(collection(db, "questions"), questionData);
+            showToast("Soru başarıyla eklendi! 🎉");
 
-        // Formu temizle ve listeyi tazele
-        document.getElementById('addQuestionForm').reset();
-        fileInputs.forEach(item => {
-            const prev = document.getElementById(item.preview);
-            if (prev) prev.style.display = 'none';
-        });
+            // Formu temizle
+            document.getElementById('addQuestionForm').reset();
+            fileInputs.forEach(item => {
+                const prev = document.getElementById(item.preview);
+                if (prev) prev.style.display = 'none';
+            });
+        }
 
         loader.style.display = 'none';
-        showToast("Soru başarıyla eklendi! 🎉");
         fetchQuestions();
 
     } catch (err) {
@@ -207,6 +233,7 @@ async function fetchQuestions() {
                 <td>${imgBadge}</td>
                 <td style="font-weight: bold; color: var(--navy);">${data.cevap}</td>
                 <td style="text-align: right;">
+                    <button class="btn-outline-small" style="margin-right:8px; padding:6px 12px; font-size:12px;" onclick="editQuestion('${data.id}')">Düzenle</button>
                     <button class="btn-delete" onclick="deleteQuestion('${data.id}')">Sil</button>
                 </td>
             `;
@@ -220,6 +247,67 @@ async function fetchQuestions() {
         tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: red;">Veri çekilirken hata oluştu.</td></tr>';
     }
 }
+
+// --- SORU DÜZENLEME (EDİT) --- 
+window.editQuestion = function (docId) {
+    const question = globalQuestionsConfig.find(q => q.id === docId);
+    if (!question) return;
+
+    document.getElementById('addQuestionForm').setAttribute('data-edit-id', docId);
+    document.getElementById('soruFormTitle').innerText = "Soruyu Düzenle";
+    document.getElementById('saveQuestionBtn').innerText = "Değişiklikleri Kaydet";
+    document.getElementById('cancelQuestionBtn').style.display = "inline-block";
+
+    document.getElementById('kategori').value = question.kategori;
+    document.getElementById('cevap').value = question.cevap;
+    document.getElementById('soru').value = question.soru;
+
+    // Ana resim önizleme
+    if (question.imageUrl) {
+        document.getElementById('mainImagePreview').src = question.imageUrl;
+        document.getElementById('mainImagePreview').style.display = 'block';
+    } else {
+        document.getElementById('mainImagePreview').src = "";
+        document.getElementById('mainImagePreview').style.display = 'none';
+    }
+
+    // Şıkları doldur
+    const opts = ['textA', 'textB', 'textC', 'textD'];
+    const prevs = ['previewA', 'previewB', 'previewC', 'previewD'];
+
+    for (let i = 0; i < 4; i++) {
+        document.getElementById(opts[i]).value = '';
+        document.getElementById(prevs[i]).src = '';
+        document.getElementById(prevs[i]).style.display = 'none';
+
+        if (question.secenekler && question.secenekler[i]) {
+            const val = question.secenekler[i].split(") ")[1];
+            if (val && val.startsWith('http')) {
+                document.getElementById(prevs[i]).src = val;
+                document.getElementById(prevs[i]).style.display = 'block';
+            } else {
+                document.getElementById(opts[i]).value = val || '';
+            }
+        }
+    }
+
+    // Sayfayı kaydır
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+};
+
+// --- DÜZENLEMEYİ İPTAL ET ---
+window.cancelEditQuestion = function () {
+    document.getElementById('addQuestionForm').removeAttribute('data-edit-id');
+    document.getElementById('addQuestionForm').reset();
+    document.getElementById('soruFormTitle').innerText = "Yeni Soru Ekle";
+    document.getElementById('saveQuestionBtn').innerText = "Soruyu Firebase'e Kaydet";
+    document.getElementById('cancelQuestionBtn').style.display = "none";
+
+    fileInputs.forEach(item => {
+        const prev = document.getElementById(item.preview);
+        if (prev) { prev.style.display = 'none'; prev.src = ''; }
+    });
+};
 
 // --- SORU VE BAĞLI GÖRSELLERİ SİLME (TAM TEMİZLİK) ---
 window.deleteQuestion = async function (docId) {
@@ -453,6 +541,7 @@ async function loadRehberPosts() {
                 <td style="font-size:13px;color:#64748b;">${dateStr}</td>
                 <td style="text-align:right;">
                     <a href="rehber-detay.html?slug=${data.slug}" target="_blank" style="margin-right:8px;font-size:12px;color:var(--navy);">Görüntüle</a>
+                    <button class="btn-outline-small" style="margin-right:8px; padding:6px 12px; font-size:12px;" onclick="editRehberPost('${d.id}')">Düzenle</button>
                     <button class="btn-delete" onclick="deleteRehberPost('${d.id}')">Sil</button>
                 </td>`;
             tbody.appendChild(tr);
@@ -484,19 +573,33 @@ window.saveRehberPost = async function () {
 
     const slug = slugRaw.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
 
+    // Düzenleme Modu Kontrolü
+    const editId = document.getElementById('rehberFormWrapper').getAttribute('data-edit-id');
+
     loader.style.display = 'flex';
     loaderText.innerText = 'Rehber yazısı kaydediliyor...';
 
     try {
-        await addDoc(collection(db, 'rehber'), {
-            baslik, kisaOz, tamMetin, kategori, gorselUrl, slug,
-            yayinTarihi: serverTimestamp()
-        });
+        const postData = {
+            baslik, kisaOz, tamMetin, kategori, gorselUrl, slug
+        };
+
+        if (editId) {
+            // Güncelleme yap
+            await updateDoc(doc(db, 'rehber', editId), postData);
+            showToast('Rehber yazısı başarıyla güncellendi! ✅');
+            window.cancelEditRehber();
+        } else {
+            // Yeni Ekleme
+            postData.yayinTarihi = serverTimestamp();
+            await addDoc(collection(db, 'rehber'), postData);
+            showToast('Rehber yazısı başarıyla eklendi! 🎉');
+            // Formu temizle
+            ['rehberBaslik', 'rehberKisaOz', 'rehberTamMetin', 'rehberGorselUrl', 'rehberSlug']
+                .forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
+        }
+
         loader.style.display = 'none';
-        showToast('Rehber yazısı başarıyla eklendi! 🎉');
-        // Formu temizle
-        ['rehberBaslik', 'rehberKisaOz', 'rehberTamMetin', 'rehberGorselUrl', 'rehberSlug']
-            .forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
         loadRehberPosts();
     } catch (err) {
         loader.style.display = 'none';
@@ -504,6 +607,54 @@ window.saveRehberPost = async function () {
         alert('Rehber yazısı kaydedilemedi: ' + err.message);
     }
 };
+
+// --- REHBER YAZISI DÜZENLEME (EDİT) ---
+window.editRehberPost = async function (docId) {
+    const loader = document.getElementById('loader');
+    loader.style.display = 'flex';
+
+    try {
+        const docRef = doc(db, 'rehber', docId);
+        const docSnap = await getDocs(query(collection(db, 'rehber')));
+        let targetDoc = null;
+
+        docSnap.forEach(d => {
+            if (d.id === docId) targetDoc = d.data();
+        });
+
+        if (targetDoc) {
+            document.getElementById('rehberFormWrapper').setAttribute('data-edit-id', docId);
+            document.getElementById('rehberFormTitle').innerText = "📰 Yazıyı Düzenle";
+            document.getElementById('saveRehberBtn').innerText = "Değişiklikleri İleti Güncelle";
+            document.getElementById('cancelRehberBtn').style.display = "inline-block";
+
+            document.getElementById('rehberKategori').value = targetDoc.kategori || "Mevzuat";
+            document.getElementById('rehberSlug').value = targetDoc.slug || "";
+            document.getElementById('rehberBaslik').value = targetDoc.baslik || "";
+            document.getElementById('rehberKisaOz').value = targetDoc.kisaOz || "";
+            document.getElementById('rehberTamMetin').value = targetDoc.tamMetin || "";
+            document.getElementById('rehberGorselUrl').value = targetDoc.gorselUrl || "";
+
+            // Sayfayı formun mntıkalarına kaydır
+            document.getElementById('rehberSection').scrollIntoView({ behavior: 'smooth' });
+        }
+    } catch (err) {
+        console.error("Düzenleme için veri çekilemedi:", err);
+    }
+    loader.style.display = 'none';
+};
+
+// --- REHBER DÜZENLEMEYİ İPTAL ET ---
+window.cancelEditRehber = function () {
+    document.getElementById('rehberFormWrapper').removeAttribute('data-edit-id');
+    ['rehberBaslik', 'rehberKisaOz', 'rehberTamMetin', 'rehberGorselUrl', 'rehberSlug']
+        .forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
+
+    document.getElementById('rehberFormTitle').innerText = "📰 Yeni Bilgi Merkezi Yazısı Ekle";
+    document.getElementById('saveRehberBtn').innerText = "📰 Yazıyı Firebase'e Kaydet";
+    document.getElementById('cancelRehberBtn').style.display = "none";
+};
+
 
 // Rehber yazısı sil
 window.deleteRehberPost = async function (docId) {
