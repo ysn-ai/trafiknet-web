@@ -400,25 +400,35 @@ function getDkrWidgetHTML() {
             <div class="dkr-field">
                 <label class="dkr-label">💰 Piyasa Değeri (TL)</label>
                 <div class="dkr-input-wrap">
-                    <input type="number" id="dkrFiyat" class="dkr-input" placeholder="Örn: 1500000" min="0" step="10000">
+                    <input type="number" id="dkrFiyat" class="dkr-input dkr-light-input" placeholder="Örn: 1500000" min="0" step="10000">
                     <span class="dkr-unit">TL</span>
                 </div>
             </div>
             <div class="dkr-field">
                 <label class="dkr-label">🛣️ Kilometre</label>
                 <div class="dkr-input-wrap">
-                    <input type="number" id="dkrKm" class="dkr-input" placeholder="Örn: 45000" min="0" step="1000">
+                    <input type="number" id="dkrKm" class="dkr-input dkr-light-input" placeholder="Örn: 45000" min="0" step="1000">
                     <span class="dkr-unit">KM</span>
                 </div>
             </div>
             <div class="dkr-field">
                 <label class="dkr-label">🔨 Hasar Durumu</label>
-                <select id="dkrHasar" class="dkr-input dkr-select">
+                <select id="dkrHasar" class="dkr-input dkr-select dkr-light-input">
                     <option value="1.0">Hasarsız / Boya &amp; Çizik</option>
                     <option value="1.5" selected>Küçük Hasar (Panel, Far vb.)</option>
                     <option value="2.2">Orta Hasar (Motor Kaputu, Kapı)</option>
                     <option value="3.0">Büyük Hasar (Yapısal / Kaporta)</option>
                     <option value="4.0">Ağır Hasar (Şase / Airbag)</option>
+                </select>
+            </div>
+            <div class="dkr-field">
+                <label class="dkr-label">⚖️ Kaza Kusur Oranı</label>
+                <select id="dkrKusur" class="dkr-input dkr-select dkr-light-input">
+                    <option value="0" selected>%0 Kusurluyum (Tam Haklı)</option>
+                    <option value="0.25">%25 Kusurluyum</option>
+                    <option value="0.50">%50 Kusurluyum (Yarı Yarıya)</option>
+                    <option value="0.75">%75 Kusurluyum</option>
+                    <option value="1.0">%100 Kusurluyum (Tam Haksız)</option>
                 </select>
             </div>
         </div>
@@ -431,11 +441,15 @@ function getDkrWidgetHTML() {
                 <span class="dkr-result-value" id="dkrKatsayi">—</span>
             </div>
             <div class="dkr-result-row">
-                <span class="dkr-result-label">Tahmini Değer Kaybı (%)</span>
+                <span class="dkr-result-label">Baz Tahmini Değer Kaybı</span>
                 <span class="dkr-result-value" id="dkrKayipOran">—</span>
             </div>
+            <div class="dkr-result-row">
+                <span class="dkr-result-label">Kusur Oranı İndirimi</span>
+                <span class="dkr-result-value dkr-red" id="dkrKusurIndirim">—</span>
+            </div>
             <div class="dkr-result-row dkr-highlight">
-                <span class="dkr-result-label">Tahmini Tazminat Tutarı</span>
+                <span class="dkr-result-label">Hak Edilen Tazminat</span>
                 <span class="dkr-result-value" id="dkrKayipTutar">—</span>
             </div>
             <div class="dkr-result-row">
@@ -444,9 +458,9 @@ function getDkrWidgetHTML() {
             </div>
             <div class="dkr-result-row">
                 <span class="dkr-result-label">Kaza Sonrası Piyasa Değeri</span>
-                <span class="dkr-result-value dkr-red" id="dkrGuncelDeger">—</span>
+                <span class="dkr-result-value" id="dkrGuncelDeger" style="color: #666;">—</span>
             </div>
-            <p class="dkr-disclaimer">⚠️ Bu hesaplama yaklaşık TRAMER yöntemiyle yapılmıştır. Kesin değer için bağımsız ekspere ve hukuki danışmanlık alınması önerilir.</p>
+            <p class="dkr-disclaimer">⚠️ Bu hesaplama yaklaşık TRAMER yöntemi ve kusur oranına göre yapılmıştır. Kesin değer için bağımsız ekspere ve hukuki danışmanlık alınması önerilir.</p>
         </div>
     </div>`;
 }
@@ -460,6 +474,7 @@ window.dkrHesapla = function () {
     const piyasa = parseFloat(document.getElementById('dkrFiyat').value);
     const km = parseFloat(document.getElementById('dkrKm').value);
     const hasar = parseFloat(document.getElementById('dkrHasar').value);
+    const kusur = parseFloat(document.getElementById('dkrKusur').value); // 0 (tam haklı) ile 1 (tam haksız) arası
 
     if (!piyasa || isNaN(piyasa) || piyasa <= 0) { alert('Lütfen geçerli bir piyasa değeri girin.'); return; }
     if (isNaN(km) || km < 0) { alert('Lütfen geçerli bir kilometre değeri girin.'); return; }
@@ -467,21 +482,45 @@ window.dkrHesapla = function () {
     // KM katsayısı: her 10.000 km için 0.05 ek (maks 1.50)
     const kmKatsayi = Math.min(1 + (km / 10000) * 0.05, 1.50);
 
-    // Temel formül: Piyasa Değeri × 0.15 × hasarKatsayısı × kmKatsayısı
-    const kayipTutar = piyasa * 0.15 * hasar * kmKatsayi;
-    const kayipOrani = (kayipTutar / piyasa) * 100;
-    const guncelDeger = Math.max(piyasa - kayipTutar, 0);
+    // Temel Baz Formül: Piyasa Değeri × 0.15 × hasarKatsayısı × kmKatsayısı
+    const bazTutar = piyasa * 0.15 * hasar * kmKatsayi;
+    const bazOran = (bazTutar / piyasa) * 100;
 
-    // Tazminat bant aralığı (±%15)
-    const bantAlt = kayipTutar * 0.85;
-    const bantUst = kayipTutar * 1.15;
+    // Kusur Oranı Filtresi: Haksız olunan kısım kadar tazminattan düşülür
+    const hakEdilenOran = 1.0 - kusur;
+    const hakEdilenTutar = bazTutar * hakEdilenOran;
+    const kusurIndirimTutari = bazTutar - hakEdilenTutar;
+
+    const guncelDeger = Math.max(piyasa - bazTutar, 0);
+
+    // Tazminat bant aralığı (±%15) — hak edilen üzerinden
+    const bantAlt = hakEdilenTutar * 0.85;
+    const bantUst = hakEdilenTutar * 1.15;
 
     const formatTL = (n) => n.toLocaleString('tr-TR', { minimumFractionDigits: 0, maximumFractionDigits: 0 }) + ' TL';
 
     document.getElementById('dkrKatsayi').textContent = 'x' + hasar.toFixed(1) + ' hasar, x' + kmKatsayi.toFixed(2) + ' km';
-    document.getElementById('dkrKayipOran').textContent = '%' + Math.min(kayipOrani, 80).toFixed(1);
-    document.getElementById('dkrKayipTutar').textContent = formatTL(kayipTutar);
-    document.getElementById('dkrBant').textContent = formatTL(bantAlt) + ' — ' + formatTL(bantUst);
+    document.getElementById('dkrKayipOran').textContent = formatTL(bazTutar) + ' (%' + Math.min(bazOran, 80).toFixed(1) + ')';
+
+    const kusurIndirimEl = document.getElementById('dkrKusurIndirim');
+    if (kusur > 0) {
+        kusurIndirimEl.textContent = '- ' + formatTL(kusurIndirimTutari) + ' (%' + (kusur * 100) + ' Kusur)';
+        kusurIndirimEl.style.display = 'inline';
+        kusurIndirimEl.parentElement.style.display = 'flex';
+    } else {
+        kusurIndirimEl.parentElement.style.display = 'none';
+    }
+
+    document.getElementById('dkrKayipTutar').textContent = formatTL(hakEdilenTutar);
+
+    const bantEl = document.getElementById('dkrBant');
+    if (hakEdilenTutar > 0) {
+        bantEl.textContent = formatTL(bantAlt) + ' — ' + formatTL(bantUst);
+        bantEl.parentElement.style.display = 'flex';
+    } else {
+        bantEl.parentElement.style.display = 'none';
+    }
+
     document.getElementById('dkrGuncelDeger').textContent = formatTL(guncelDeger);
 
     const sonuc = document.getElementById('dkrSonuc');
